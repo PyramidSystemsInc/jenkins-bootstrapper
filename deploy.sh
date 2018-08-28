@@ -54,7 +54,16 @@ fi
 sudo rm ~/Desktop/$PROJECT_NAME.pem
 aws --region us-east-2 ec2 delete-key-pair --key-name $PROJECT_NAME
 aws --region us-east-2 ec2 create-key-pair --key-name $PROJECT_NAME --query 'KeyMaterial' --output text > ~/Desktop/$PROJECT_NAME.pem
-chmod 400 ~/Desktop/$PROJECT_NAME.pem
+KEY_PAIR=$(cat ~/Desktop/$PROJECT_NAME.pem)
+if [ ${#KEY_PAIR} == 0 ]; then
+  rm ~/Desktop/$PROJECT_NAME.pem
+  echo -e ""
+  echo -e "${COLOR_RED}ERROR: PEM file was unable to be created. Do you have permissions on your AWS account to create key pairs?"
+  echo -e "${COLOR_NONE}"
+  exit 2
+else
+  chmod 400 ~/Desktop/$PROJECT_NAME.pem
+fi
 
 # Install Pulumi dependencies
 npm install

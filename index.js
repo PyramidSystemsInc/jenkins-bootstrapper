@@ -68,8 +68,11 @@ echo "" | sudo tee --append /home/ec2-user/printJenkinsPassword.sh
 echo "sudo cat /var/lib/jenkins/secrets/initialAdminPassword" | sudo tee --append /home/ec2-user/printJenkinsPassword.sh
 sudo chmod 755 /home/ec2-user/printJenkinsPassword.sh
 
-# If an S3 Bucket with the same name exists on that AWS account, download all its files
+# If an S3 Bucket with a name matching the PROJECT_NAME exists on the AWS account provided, download all the files in the bucket
 aws s3 sync s3://${projectName} /home/ec2-user/
+
+# Download the Jenkins CLI JAR
+wget http://localhost:8080/jnlpJars/jenkins-cli.jar > output.txt
 
 # Restart NGinX
 sudo service nginx restart
