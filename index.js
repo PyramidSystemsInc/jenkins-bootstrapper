@@ -72,9 +72,14 @@ sudo chmod 755 /home/ec2-user/printJenkinsPassword.sh
 aws s3 sync s3://${projectName} /home/ec2-user/
 
 # Download the Jenkins CLI JAR
-wget http://localhost:8080/jnlpJars/jenkins-cli.jar > output.txt
+cd /home/ec2-user
+sleep 20
+wget http://localhost:8080/jnlpJars/jenkins-cli.jar
+JENKINS_PASSWORD=$(./printJenkinsPassword.sh)
+java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD create-job my-new-job < template.xml
 
-# Restart NGinX
+# Restart services
+sudo service jenkins restart
 sudo service nginx restart
 `;
 

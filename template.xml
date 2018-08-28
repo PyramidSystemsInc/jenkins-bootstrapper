@@ -3,30 +3,15 @@
   <actions/>
   <description></description>
   <keepDependencies>false</keepDependencies>
-  <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.StringParameterDefinition>
-          <name>KEY</name>
-          <description>Description</description>
-          <defaultValue>VALUE</defaultValue>
-          <trim>false</trim>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
-  </properties>
+  <properties/>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <url>https://github.com/PyramidSystemsInc/jenkins-bootstrapper.git</url>
-        <credentialsId>86fe4d78-6d55-4666-93b8-02ba9be7c98b</credentialsId>
+        <url>https://github.com/jeffdiederiks/project-euler.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
-      <hudson.plugins.git.BranchSpec>
-        <name>*/master</name>
-      </hudson.plugins.git.BranchSpec>
       <hudson.plugins.git.BranchSpec>
         <name>*/master</name>
       </hudson.plugins.git.BranchSpec>
