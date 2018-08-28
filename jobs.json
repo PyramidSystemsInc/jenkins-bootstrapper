@@ -2,7 +2,7 @@
   "jobs": [
     {
       "name": "ctbl-dev",
-      "status": "enabled",
+      "enabled": "true",
       "parameters": [
         {
           "type": "string",
@@ -18,10 +18,10 @@
         }
       ],
       "git": {
-        "url": "https://github.com/PyramidSystemsInc/jenkins-bootstrapper.git",
+        "url": "https://github.com/jeffdiederiks/project-euler.git",
         "credentials": {
-          "username": 
-          "password": 
+          "username": "",
+          "password": ""
         },
         "trigger": [
           "*/master"

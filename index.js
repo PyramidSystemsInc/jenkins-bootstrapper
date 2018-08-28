@@ -74,6 +74,7 @@ aws s3 sync s3://${projectName} /home/ec2-user/
 # Download the Jenkins CLI JAR
 cd /home/ec2-user
 sleep 20
+sudo sed -i 's#<installStateName>NEW.*#<installStateName>RUNNING<\/installStateName>#g' /var/lib/jenkins/config.xml
 wget http://localhost:8080/jnlpJars/jenkins-cli.jar
 JENKINS_PASSWORD=$(./printJenkinsPassword.sh)
 java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD create-job my-new-job < template.xml
