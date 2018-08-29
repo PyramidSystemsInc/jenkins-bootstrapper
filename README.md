@@ -8,8 +8,9 @@ Creates an AWS EC2 instance running Jenkins configured to run build jobs and run
 
 - [X] Creates an EC2 instance running Jenkins with one run of a script
 - [X] Copies files from an S3 bucket to the Jenkins EC2 instance to ensure private data stays private
-- [ ] Creates jobs programmatically based on a JSON config file
-- [ ] Detects Jenkins plugins needed and installs them automatically
+- [X] Creates jobs programmatically based on a JSON config file
+- [ ] Creates necessary credentials in Jenkins from JSON configuration file (**in progress**)
+- [ ] Detects Jenkins plugins needed and installs them automatically (**in progress**)
 - [ ] Stands up a Selenium grid in ECS, setup as Jenkins slaves, for distributed test execution
 - [ ] Runs Sonarqube plugin on Jenkins to output clean HTML reports of the health of the application(s) being built by Jenkins
 - [ ] Features clean output of the `./deploy.sh` script
@@ -23,9 +24,9 @@ Creates an AWS EC2 instance running Jenkins configured to run build jobs and run
 
 ### Usage
 
-1. Create an S3 bucket on the AWS account whose credentials you plan to use
+1. Create an S3 bucket named after your `PROJECT_NAME`
 
-2. Create a `jobs.json` file using the sample file in this project
+2. Create a `jobs.json` file using the sample files in this project
 
 3. Upload your new `jobs.json` file to your S3 bucket
 
@@ -45,4 +46,4 @@ For example:
 
 `./deploy sample-project skjdfklsdj 239lassfaskjf993ksjdfk`
 
-5. Add one or more webhooks to your new Jenkins instance on [GitHub's website](https://github.com/)
+5. Add the necessary webhooks to your new Jenkins instance on [GitHub's website](https://github.com/)

@@ -95,7 +95,8 @@ echo -e "${COLOR_NONE}"
 echo -e "${COLOR_WHITE}NOTICE: Once the instance is done being configured, you can reach Jenkins at the following address in your browser:"
 echo -e "    $EC2_IP:8080"
 echo -e "${COLOR_NONE}"
-echo -e "${COLOR_WHITE}NOTICE: You will need to run the ./printJenkinsPassword.sh script located in the home directory of the EC2 instance in order to login to the Jenkins interface through the browser"
+echo -e "${COLOR_WHITE}NOTICE: After navigating to the URL above, enter the username \"admin\""
+echo -e "        The password can be found by running ./printJenkinsPassword.sh located in the home directory of the EC2 instance"
 echo -e "${COLOR_NONE}"
 sleep 12
 ssh -i ~/Desktop/$PROJECT_NAME.pem ec2-user@$EC2_IP

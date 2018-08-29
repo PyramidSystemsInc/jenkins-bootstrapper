@@ -1,0 +1,29 @@
+{
+  "jobs": [
+    {
+      "name": "rispd-dev",
+      "enabled": "true",
+      "git": {
+        "url": "https://github.com/PyramidSystemsInc/rispd-demo.git",
+        "credentials": {
+          "username": "jdiederiks@psi-it.com",
+          "password": "<redacted>"
+        },
+        "trigger": [
+          "*/dev"
+        ]
+      },
+      "build": {
+        "concurrently": false,
+        "steps": [
+          "echo Hello",
+          "echo World",
+          "ls"
+        ]
+      },
+      "post": {
+        "email": "jdiederiks@psi-it.com"
+      }
+    }
+  ]
+}

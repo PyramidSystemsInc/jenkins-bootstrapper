@@ -65,83 +65,19 @@ echo "aws_secret_access_key = ${awsSecretKey}" | sudo tee --append /home/ec2-use
 # Start Jenkins
 sudo service jenkins start
 
-# Create script to print the default Jenkins password
-touch /home/ec2-user/printJenkinsPassword.sh
-echo "#! /bin/bash" | sudo tee --append /home/ec2-user/printJenkinsPassword.sh
-echo "" | sudo tee --append /home/ec2-user/printJenkinsPassword.sh
-echo "sudo cat /var/lib/jenkins/secrets/initialAdminPassword" | sudo tee --append /home/ec2-user/printJenkinsPassword.sh
-sudo chmod 755 /home/ec2-user/printJenkinsPassword.sh
-
-# Download all files from an S3 bucket matching the PROJECT_NAME
+# Download all files from an S3 bucket matching the PROJECT_NAME (assumes jobs.json is found in this bucket)
 aws s3 sync s3://${projectName} /home/ec2-user/
 
-# Download the Jenkins CLI JAR
+# Ensure Jenkins was started by waiting
 cd /home/ec2-user
-sleep 20
-sudo sed -i 's#<installStateName>NEW.*#<installStateName>RUNNING<\/installStateName>#g' /var/lib/jenkins/config.xml
-wget http://localhost:8080/jnlpJars/jenkins-cli.jar
-JENKINS_PASSWORD=$(./printJenkinsPassword.sh)
+sleep 30
 
-# Create Jenkins jobs from jobs.json configuration file
-java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin git
-java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin github
-JOB_INDEX=0
-JOB_NAME=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].name'))
-touch $JOB_NAME.xml
-echo "<?xml version='1.1' encoding='UTF-8'?>" | sudo tee --append $JOB_NAME.xml
-echo "<project>" | sudo tee --append $JOB_NAME.xml
-echo "<actions/>" | sudo tee --append $JOB_NAME.xml
-JOB_DESCRIPTION=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].description'))
-if [ "$JOB_DESCRIPTION" != "null" ]; then
-  echo "<description>$JOB_DESCRIPTION</description>" | sudo tee --append $JOB_NAME.xml
-else
-  echo "<description/>" | sudo tee --append $JOB_NAME.xml
-fi
-echo "<keepDependencies>false</keepDependencies>" | sudo tee --append $JOB_NAME.xml
-echo "<properties/>" | sudo tee --append $JOB_NAME.xml
-echo "<scm class=\"hudson.plugins.git.GitSCM\" plugin=\"git@3.9.1\">" | sudo tee --append $JOB_NAME.xml
-echo "<configVersion>2</configVersion>" | sudo tee --append $JOB_NAME.xml
-echo "<userRemoteConfigs>" | sudo tee --append $JOB_NAME.xml
-echo "<hudson.plugins.git.UserRemoteConfig>" | sudo tee --append $JOB_NAME.xml
-JOB_GIT_URL=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].git.url'))
-echo "<url>$JOB_GIT_URL</url>" | sudo tee --append $JOB_NAME.xml
-echo "</hudson.plugins.git.UserRemoteConfig>" | sudo tee --append $JOB_NAME.xml
-echo "</userRemoteConfigs>" | sudo tee --append $JOB_NAME.xml
-echo "<branches>" | sudo tee --append $JOB_NAME.xml
-echo "<hudson.plugins.git.BranchSpec>" | sudo tee --append $JOB_NAME.xml
-JOB_GIT_TRIGGER=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].git.trigger[0]'))
-echo "<name>$JOB_GIT_TRIGGER</name>" | sudo tee --append $JOB_NAME.xml
-echo "</hudson.plugins.git.BranchSpec>" | sudo tee --append $JOB_NAME.xml
-echo "</branches>" | sudo tee --append $JOB_NAME.xml
-echo "<doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>" | sudo tee --append $JOB_NAME.xml
-echo "<submoduleCfg class=\"list\"/>" | sudo tee --append $JOB_NAME.xml
-echo "<extensions/>" | sudo tee --append $JOB_NAME.xml
-echo "</scm>" | sudo tee --append $JOB_NAME.xml
-echo "<canRoam>true</canRoam>" | sudo tee --append $JOB_NAME.xml
-JOB_ENABLED=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].enabled'))
-if [ "$JOB_ENABLED" == "true" ]; then
-  echo "<disabled>false</disabled>" | sudo tee --append $JOB_NAME.xml
-else
-  echo "<disabled>true</disabled>" | sudo tee --append $JOB_NAME.xml
-fi
-echo "<blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>" | sudo tee --append $JOB_NAME.xml
-echo "<blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>" | sudo tee --append $JOB_NAME.xml
-echo "<triggers>" | sudo tee --append $JOB_NAME.xml
-echo "<com.cloudbees.jenkins.GitHubPushTrigger plugin=\"github@1.29.2\">" | sudo tee --append $JOB_NAME.xml
-echo "<spec></spec>" | sudo tee --append $JOB_NAME.xml
-echo "</com.cloudbees.jenkins.GitHubPushTrigger>" | sudo tee --append $JOB_NAME.xml
-echo "</triggers>" | sudo tee --append $JOB_NAME.xml
-JOB_BUILD_CONCURRENTLY=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].build.concurrently'))
-echo "<concurrentBuild>$JOB_BUILD_CONCURRENTLY</concurrentBuild>" | sudo tee --append $JOB_NAME.xml
-echo "<builders>" | sudo tee --append $JOB_NAME.xml
-echo "<hudson.tasks.Shell>" | sudo tee --append $JOB_NAME.xml
-echo "<command>ls</command>" | sudo tee --append $JOB_NAME.xml
-echo "</hudson.tasks.Shell>" | sudo tee --append $JOB_NAME.xml
-echo "</builders>" | sudo tee --append $JOB_NAME.xml
-echo "<publishers/>" | sudo tee --append $JOB_NAME.xml
-echo "<buildWrappers/>" | sudo tee --append $JOB_NAME.xml
-echo "</project>" | sudo tee --append $JOB_NAME.xml
-# java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD create-job my-new-job < template.xml
+# Configure Jenkins using the Jenkins CLI
+wget http://localhost:8080/jnlpJars/jenkins-cli.jar
+wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureJenkins.sh
+wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPassword.sh
+sudo chmod 755 configureJenkins.sh printJenkinsPassword.sh
+./configureJenkins.sh
 
 # Restart services
 sudo service jenkins restart
