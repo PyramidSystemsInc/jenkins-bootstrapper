@@ -24,6 +24,31 @@
       "post": {
         "email": "jdiederiks@psi-it.com"
       }
+    },
+    {
+      "name": "rispd-stage",
+      "enabled": "true",
+      "git": {
+        "url": "https://github.com/PyramidSystemsInc/rispd-demo.git",
+        "credentials": {
+          "username": "jdiederiks@psi-it.com",
+          "password": "<redacted>"
+        },
+        "trigger": [
+          "*/stage"
+        ]
+      },
+      "build": {
+        "concurrently": false,
+        "steps": [
+          "echo \"I am prod ready\"",
+          "echo \"No I'm not\"",
+          "ls"
+        ]
+      },
+      "post": {
+        "email": "jdiederiks@psi-it.com"
+      }
     }
   ]
 }
