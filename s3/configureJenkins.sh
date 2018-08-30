@@ -11,7 +11,7 @@ java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD
 
 # Restart Jenkins to complete the installation of the plugins, then ensure Jenkins is up before continuing
 sudo service jenkins restart
-sleep 45
+sleep 70
 
 # Create native Jenkins job template XML files from jobs.json and use the new XML file to create a Jenkins job
 JOB_COUNT=$(cat jobs.json | jq '.jobs | length')

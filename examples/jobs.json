@@ -16,9 +16,18 @@
       "build": {
         "concurrently": false,
         "steps": [
-          "echo Hello",
-          "echo World",
-          "ls"
+          "npm install",
+          "npm run build:dev",
+          "./gradlew shadowJar",
+          "$(aws ecr get-login --no-include-email --region us-east-2)",
+          "docker build -t 118104210923.dkr.ecr.us-east-2.amazonaws.com/rispd:dev-latest .",
+          "docker tag 118104210923.dkr.ecr.us-east-2.amazonaws.com/rispd:dev-latest 118104210923.dkr.ecr.us-east-2.amazonaws.com/rispd:dev-$BUILD_NUMBER",
+          "docker push 118104210923.dkr.ecr.us-east-2.amazonaws.com/rispd:dev-latest",
+          "cd deploy/compose-files/rispd",
+          "/usr/local/bin/ecs-cli configure --cluster rispd-dev --region us-east-2 --default-launch-type EC2 --config-name rispd-dev",
+          "export RISPD_SUITE=dev",
+          "/usr/local/bin/ecs-cli compose down --region us-east-2 --cluster-config rispd-dev",
+          "/usr/local/bin/ecs-cli compose up --region us-east-2 --cluster-config rispd-dev"
         ]
       },
       "post": {
@@ -41,9 +50,18 @@
       "build": {
         "concurrently": false,
         "steps": [
-          "echo \"I am prod ready\"",
-          "echo \"No I'm not\"",
-          "ls"
+          "npm install",
+          "npm run build:dev",
+          "./gradlew shadowJar",
+          "$(aws ecr get-login --no-include-email --region us-east-2)",
+          "docker build -t 118104210923.dkr.ecr.us-east-2.amazonaws.com/rispd:stage-latest .",
+          "docker tag 118104210923.dkr.ecr.us-east-2.amazonaws.com/rispd:stage-latest 118104210923.dkr.ecr.us-east-2.amazonaws.com/rispd:stage-$BUILD_NUMBER",
+          "docker push 118104210923.dkr.ecr.us-east-2.amazonaws.com/rispd:stage-latest",
+          "cd deploy/compose-files/rispd",
+          "/usr/local/bin/ecs-cli configure --cluster rispd-stage --region us-east-2 --default-launch-type EC2 --config-name rispd-stage",
+          "export RISPD_SUITE=stage",
+          "/usr/local/bin/ecs-cli compose down --region us-east-2 --cluster-config rispd-stage",
+          "/usr/local/bin/ecs-cli compose up --region us-east-2 --cluster-config rispd-stage"
         ]
       },
       "post": {

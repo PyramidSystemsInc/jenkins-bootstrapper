@@ -6,13 +6,13 @@ Creates an AWS EC2 instance running Jenkins configured to run build jobs and run
 
 ### Features
 
-- [X] Creates an EC2 instance running Jenkins with one run of a script
+- [X] Creates an EC2 instance running Jenkins with a single script
 - [X] Copies files from an S3 bucket to the Jenkins EC2 instance to ensure private data stays private
 - [X] Creates jobs programmatically based on a JSON config file
-- [ ] Creates necessary credentials in Jenkins from JSON configuration file (**in progress**)
-- [ ] Detects Jenkins plugins needed and installs them automatically (**in progress**)
+- [X] Creates necessary credentials in Jenkins from the JSON configuration file
 - [ ] Stands up a Selenium grid in ECS, setup as Jenkins slaves, for distributed test execution
 - [ ] Runs Sonarqube plugin on Jenkins to output clean HTML reports of the health of the application(s) being built by Jenkins
+- [ ] Supports various post-build actions (i.e. email confirmation for builds)
 - [ ] Features clean output of the `./deploy.sh` script
 - [ ] Features a script to create the `jobs.json` configuration file using command line input
 

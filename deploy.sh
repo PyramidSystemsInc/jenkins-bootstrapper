@@ -51,12 +51,9 @@ else
 fi
 
 # Create key pair
-sudo rm ~/Desktop/$PROJECT_NAME.pem
-aws --region us-east-2 ec2 delete-key-pair --key-name $PROJECT_NAME
 aws --region us-east-2 ec2 create-key-pair --key-name $PROJECT_NAME --query 'KeyMaterial' --output text > ~/Desktop/$PROJECT_NAME.pem
 KEY_PAIR=$(cat ~/Desktop/$PROJECT_NAME.pem)
 if [ ${#KEY_PAIR} == 0 ]; then
-  rm ~/Desktop/$PROJECT_NAME.pem
   echo -e ""
   echo -e "${COLOR_RED}ERROR: PEM file was unable to be created. Do you have permissions on your AWS account to create key pairs?"
   echo -e "${COLOR_NONE}"
@@ -94,6 +91,9 @@ echo -e "         It should finish configuring itself in about a minute and a ha
 echo -e "${COLOR_NONE}"
 echo -e "${COLOR_WHITE}NOTICE: Once the instance is done being configured, you can reach Jenkins at the following address in your browser:"
 echo -e "    $EC2_IP:8080"
+echo -e "${COLOR_NONE}"
+echo -e "${COLOR_WHITE}NOTICE: This is the webhook URL that must be pasted in to the Payload URL field on GitHub:"
+echo -e "    http://$EC2_IP:8080/github-webhook/"
 echo -e "${COLOR_NONE}"
 echo -e "${COLOR_WHITE}NOTICE: After navigating to the URL above, enter the username \"admin\""
 echo -e "        The password can be found by running ./printJenkinsPassword.sh located in the home directory of the EC2 instance"
