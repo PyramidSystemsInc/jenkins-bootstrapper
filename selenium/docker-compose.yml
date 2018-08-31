@@ -1,0 +1,38 @@
+version: "3"
+services:
+  selenium-hub:
+    image: selenium/hub:3.14.0-beryllium
+    ports:
+      - "80:4444"
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: selenium
+        awslogs-region: us-east-2
+        awslogs-stream-prefix: selenium_
+  selenium-chrome:
+    image: selenium/node-chrome:3.14.0-beryllium
+    volumes:
+      - /dev/shm:/dev/shm
+    environment:
+      - HUB_HOST=172.17.0.2
+      - HUB_PORT=4444
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: selenium
+        awslogs-region: us-east-2
+        awslogs-stream-prefix: selenium_
+  selenium-firefox:
+    image: selenium/node-firefox:3.14.0-beryllium
+    volumes:
+      - /dev/shm:/dev/shm
+    environment:
+      - HUB_HOST=172.17.0.2
+      - HUB_PORT=4444
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: selenium
+        awslogs-region: us-east-2
+        awslogs-stream-prefix: selenium_

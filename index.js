@@ -142,7 +142,7 @@ let group = new aws.ec2.SecurityGroup(id, {
 let server = new aws.ec2.Instance(id, {
   ami: ami,
   instanceType: size,
-  keyName: projectName,
+  keyName: projectName + '-jenkins',
   rootBlockDevice: {
     volumeSize: 16,
     volumeType: 'gp2'

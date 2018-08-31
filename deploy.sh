@@ -51,15 +51,15 @@ else
 fi
 
 # Create key pair
-aws --region us-east-2 ec2 create-key-pair --key-name $PROJECT_NAME --query 'KeyMaterial' --output text > ~/Desktop/$PROJECT_NAME.pem
-KEY_PAIR=$(cat ~/Desktop/$PROJECT_NAME.pem)
+aws --region us-east-2 ec2 create-key-pair --key-name $PROJECT_NAME-jenkins --query 'KeyMaterial' --output text > ~/Desktop/$PROJECT_NAME-jenkins.pem
+KEY_PAIR=$(cat ~/Desktop/$PROJECT_NAME-jenkins.pem)
 if [ ${#KEY_PAIR} == 0 ]; then
   echo -e ""
   echo -e "${COLOR_RED}ERROR: PEM file was unable to be created. Do you have permissions on your AWS account to create key pairs?"
   echo -e "${COLOR_NONE}"
   exit 2
 else
-  chmod 400 ~/Desktop/$PROJECT_NAME.pem
+  chmod 400 ~/Desktop/$PROJECT_NAME-jenkins.pem
 fi
 
 # Install Pulumi dependencies
@@ -81,10 +81,15 @@ pulumi update -y
 # Cleanup
 rm Pulumi.$PROJECT_NAME-jenkins.yaml
 
+# Start Selenium Grid
+cd selenium
+./deploy.sh
+cd ..
+
 # Login to EC2 instance
 EC2_IP=$(pulumi stack output ipAddress)
 echo -e "${COLOR_WHITE}NOTICE: Logging into Jenkins EC2 instance with the command:"
-echo -e "    ssh -i ~/Desktop/$PROJECT_NAME.pem ec2-user@$EC2_IP"
+echo -e "    ssh -i ~/Desktop/$PROJECT_NAME-jenkins.pem ec2-user@$EC2_IP"
 echo -e "${COLOR_NONE}"
 echo -e "${COLOR_YELLOW}WARNING: The instance is still being configured so don't freak out if your stuff isn't there yet"
 echo -e "         It should finish configuring itself in about a minute and a half"
@@ -99,4 +104,4 @@ echo -e "${COLOR_WHITE}NOTICE: After navigating to the URL above, enter the user
 echo -e "        The password can be found by running ./printJenkinsPassword.sh located in the home directory of the EC2 instance"
 echo -e "${COLOR_NONE}"
 sleep 12
-ssh -i ~/Desktop/$PROJECT_NAME.pem ec2-user@$EC2_IP
+ssh -i ~/Desktop/$PROJECT_NAME-jenkins.pem ec2-user@$EC2_IP
