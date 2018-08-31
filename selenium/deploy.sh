@@ -26,3 +26,4 @@ sleep 21
 
 # Create ECS tasks
 ecs-cli compose up --create-log-groups --cluster-config $PROJECT_NAME-selenium
+export PROJECT_NAME=$PROJECT_NAME

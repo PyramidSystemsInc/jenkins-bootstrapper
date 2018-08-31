@@ -8,10 +8,6 @@ let awsSecretKey = config.require('AWS_SECRET_ACCESS_KEY');
 let startupScript = `
 #!/bin/bash
 
-# Set AWS Credentials
-export AWS_ACCESS_KEY_ID=${awsAccessKey}
-export AWS_SECRET_ACCESS_KEY=${awsSecretKey}
-
 # Install Java 8
 sudo yum update -y
 sudo yum remove java-1.7.0-openjdk -y
@@ -74,6 +70,9 @@ aws s3 sync s3://${projectName} /home/ec2-user/
 # Ensure Jenkins was started by waiting
 cd /home/ec2-user
 sleep 30
+
+# Set environment variables
+echo -e "export PROJECT_NAME=${projectName}" /etc/profile
 
 # Configure Jenkins using the Jenkins CLI
 wget http://localhost:8080/jnlpJars/jenkins-cli.jar
