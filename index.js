@@ -83,12 +83,11 @@ echo "export PROJECT_NAME=${projectName}" | sudo tee --append /etc/profile
 wget http://localhost:8080/jnlpJars/jenkins-cli.jar
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureJenkins.sh
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPassword.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/getSeleniumIp.sh
+wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureNetworking.sh
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/updateRoute53.sh
-sudo chmod 755 configureJenkins.sh printJenkinsPassword.sh getSeleniumIp.sh updateRoute53.sh
+sudo chmod 755 configureJenkins.sh configureNetworking.sh printJenkinsPassword.sh
 ./configureJenkins.sh
-./getSeleniumIp.sh ${projectName}
-./updateRoute53.sh rispd.pyramidchallenges.com.
+./configureNetworking.sh ${projectName} rispd.pyramidchallenges.com.
 
 # Restart services
 sudo service jenkins restart
