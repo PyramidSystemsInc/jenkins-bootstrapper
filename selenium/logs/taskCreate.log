@@ -1,0 +1,29 @@
+time="2018-09-05T12:33:42-04:00" level=info msg="Saved ECS CLI cluster configuration rispd-selenium."
+time="2018-09-05T12:33:43-04:00" level=info msg="Using recommended Amazon Linux AMI with ECS Agent 1.20.1 and Docker version 18.03.1-ce"
+time="2018-09-05T12:33:43-04:00" level=info msg="Created cluster" cluster=rispd-selenium region=us-east-2
+time="2018-09-05T12:33:43-04:00" level=info msg="Waiting for your cluster resources to be created..."
+time="2018-09-05T12:33:43-04:00" level=info msg="Cloudformation stack status" stackStatus=CREATE_IN_PROGRESS
+time="2018-09-05T12:34:43-04:00" level=info msg="Cloudformation stack status" stackStatus=CREATE_IN_PROGRESS
+time="2018-09-05T12:35:44-04:00" level=info msg="Cloudformation stack status" stackStatus=CREATE_IN_PROGRESS
+time="2018-09-05T12:37:15-04:00" level=info msg="Using ECS task definition" TaskDefinition="selenium:15"
+time="2018-09-05T12:37:15-04:00" level=warning msg="Failed to create log group selenium in us-east-2: The specified log group already exists"
+time="2018-09-05T12:37:15-04:00" level=warning msg="Failed to create log group selenium in us-east-2: The specified log group already exists"
+time="2018-09-05T12:37:15-04:00" level=warning msg="Failed to create log group selenium in us-east-2: The specified log group already exists"
+time="2018-09-05T12:37:15-04:00" level=info msg="Starting container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome
+time="2018-09-05T12:37:15-04:00" level=info msg="Starting container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox
+time="2018-09-05T12:37:15-04:00" level=info msg="Starting container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub
+time="2018-09-05T12:37:15-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:15-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:15-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:27-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:27-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:27-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:39-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:39-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:39-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:51-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:51-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:37:51-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox desiredStatus=RUNNING lastStatus=PENDING taskDefinition="selenium:15"
+time="2018-09-05T12:38:04-04:00" level=info msg="Started container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome desiredStatus=RUNNING lastStatus=RUNNING taskDefinition="selenium:15"
+time="2018-09-05T12:38:04-04:00" level=info msg="Started container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub desiredStatus=RUNNING lastStatus=RUNNING taskDefinition="selenium:15"
+time="2018-09-05T12:38:04-04:00" level=info msg="Started container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox desiredStatus=RUNNING lastStatus=RUNNING taskDefinition="selenium:15"

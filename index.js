@@ -47,6 +47,10 @@ sudo yum install recode -y
 sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest
 sudo chmod +x /usr/local/bin/ecs-cli
 
+# Store AWS Credentials for root
+export AWS_ACCESS_KEY_ID=${awsAccessKey}
+export AWS_SECRET_ACCESS_KEY=${awsSecretKey}
+
 # Store AWS Credentials for Jenkins
 sudo mkdir -p /var/lib/jenkins/.aws
 sudo touch /var/lib/jenkins/.aws/credentials
@@ -72,14 +76,19 @@ cd /home/ec2-user
 sleep 30
 
 # Set environment variables
-echo -e "export PROJECT_NAME=${projectName}" /etc/profile
+echo "export PROJECT_NAME=${projectName}" | sudo tee --append /etc/profile
+. /etc/profile
 
 # Configure Jenkins using the Jenkins CLI
 wget http://localhost:8080/jnlpJars/jenkins-cli.jar
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureJenkins.sh
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPassword.sh
-sudo chmod 755 configureJenkins.sh printJenkinsPassword.sh
+wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/getSeleniumIp.sh
+wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/updateRoute53.sh
+sudo chmod 755 configureJenkins.sh printJenkinsPassword.sh getSeleniumIp.sh updateRoute53.sh
 ./configureJenkins.sh
+./getSeleniumIp.sh ${projectName}
+./updateRoute53.sh rispd.pyramidchallenges.com.
 
 # Restart services
 sudo service jenkins restart

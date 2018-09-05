@@ -1,0 +1,14 @@
+time="2018-09-05T14:32:41-04:00" level=info msg="Stopping container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome
+time="2018-09-05T14:32:41-04:00" level=info msg="Stopping container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub
+time="2018-09-05T14:32:41-04:00" level=info msg="Stopping container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox
+time="2018-09-05T14:32:41-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome desiredStatus=STOPPED lastStatus=RUNNING taskDefinition="selenium:15"
+time="2018-09-05T14:32:41-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub desiredStatus=STOPPED lastStatus=RUNNING taskDefinition="selenium:15"
+time="2018-09-05T14:32:41-04:00" level=info msg="Describe ECS container status" container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox desiredStatus=STOPPED lastStatus=RUNNING taskDefinition="selenium:15"
+time="2018-09-05T14:32:47-04:00" level=info msg="Stopped container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-chrome desiredStatus=STOPPED lastStatus=STOPPED taskDefinition="selenium:15"
+time="2018-09-05T14:32:47-04:00" level=info msg="Stopped container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-hub desiredStatus=STOPPED lastStatus=STOPPED taskDefinition="selenium:15"
+time="2018-09-05T14:32:47-04:00" level=info msg="Stopped container..." container=85eae5af-119f-4120-b9f4-f6c58fa6232d/selenium-firefox desiredStatus=STOPPED lastStatus=STOPPED taskDefinition="selenium:15"
+time="2018-09-05T14:32:47-04:00" level=info msg="Waiting for your cluster resources to be deleted..."
+time="2018-09-05T14:32:47-04:00" level=info msg="Cloudformation stack status" stackStatus=DELETE_IN_PROGRESS
+time="2018-09-05T14:33:48-04:00" level=info msg="Cloudformation stack status" stackStatus=DELETE_IN_PROGRESS
+time="2018-09-05T14:34:48-04:00" level=info msg="Cloudformation stack status" stackStatus=DELETE_IN_PROGRESS
+time="2018-09-05T14:35:18-04:00" level=info msg="Deleted cluster" cluster=rispd-selenium

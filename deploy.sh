@@ -50,6 +50,12 @@ else
   fi
 fi
 
+# Start Selenium Grid
+cd selenium
+rm -f logs/clusterCreate.log logs/taskCreate.log
+./deploy.sh $PROJECT_NAME >logs/clusterCreate.log 2>logs/taskCreate.log &
+cd ..
+
 # Create key pair
 aws --region us-east-2 ec2 create-key-pair --key-name $PROJECT_NAME-jenkins --query 'KeyMaterial' --output text > ~/Desktop/$PROJECT_NAME-jenkins.pem
 KEY_PAIR=$(cat ~/Desktop/$PROJECT_NAME-jenkins.pem)
@@ -80,11 +86,6 @@ pulumi update -y
 
 # Cleanup
 rm Pulumi.$PROJECT_NAME-jenkins.yaml
-
-# Start Selenium Grid
-cd selenium
-./deploy.sh
-cd ..
 
 # Login to EC2 instance
 EC2_IP=$(pulumi stack output ipAddress)
