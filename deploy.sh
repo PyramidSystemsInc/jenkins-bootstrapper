@@ -9,18 +9,30 @@ COLOR_NONE='\033[0m'
 # Ensure a project name is provided
 if [ -z "$1" ]; then
   echo -e "${COLOR_RED}ERROR: Project name must be provided. Please re-run as follows:${COLOR_NONE}"
-  echo -e "${COLOR_WHITE}    ./deploy.sh <PROJECT_NAME>"
+  echo -e "${COLOR_WHITE}    ./deploy.sh <PROJECT_NAME> <EXISTING_AWS_HOSTED_ZONE_NAME>"
   echo -e "    -OR-"
-  echo -e "    ./deploy.sh <PROJECT_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>"
+  echo -e "    ./deploy.sh <PROJECT_NAME> <EXISTING_AWS_HOSTED_ZONE_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>"
   echo -e "${COLOR_NONE}"
   exit 2
 else
   PROJECT_NAME=$1
 fi
 
+# Ensure a hosted zone name is provided
+if [ -z "$2" ]; then
+  echo -e "${COLOR_RED}ERROR: A hosted zone name must be provided. Please re-run as follows:${COLOR_NONE}"
+  echo -e "${COLOR_WHITE}    ./deploy.sh <PROJECT_NAME> <EXISTING_AWS_HOSTED_ZONE_NAME>"
+  echo -e "    -OR-"
+  echo -e "    ./deploy.sh <PROJECT_NAME> <EXISTING_AWS_HOSTED_ZONE_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>"
+  echo -e "${COLOR_NONE}"
+  exit 2
+else
+  HOSTED_ZONE_NAME=$2
+fi
+
 # Attempt to load AWS credentials if not provided
 # Otherwise, create or overwrite AWS credentials with the provided credentials
-if [ -z "$3" ]; then
+if [ -z "$4" ]; then
   echo -e "${COLOR_WHITE}NOTICE: Using existing AWS credentials (found at ~/.aws/credentials)${COLOR_NONE}"
   AWS_CREDENTIALS=($(cat ~/.aws/credentials))
   AWS_ACCESS_KEY=${AWS_CREDENTIALS[3]}
@@ -28,16 +40,16 @@ if [ -z "$3" ]; then
   if [ ${#AWS_ACCESS_KEY} != 20 ] || [ ${#AWS_SECRET_KEY} != 40 ]; then
     echo -e "${COLOR_RED}ERROR: Could not find a valid set of credentials at ~/.aws/credentials"
     echo -e "Please re-run with AWS credentials specified as follows:${COLOR_NONE}"
-    echo -e "${COLOR_WHITE}    ./deploy.sh <PROJECT_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>"
+    echo -e "${COLOR_WHITE}    ./deploy.sh <PROJECT_NAME> <EXISTING_AWS_HOSTED_ZONE_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>"
     echo
     echo -e "${COLOR_RED}For Example:${COLOR_NONE}"
-    echo -e "    ./deploy.sh rispd aeZ87sVkkdjfs askdf832ls97smvms8o"
+    echo -e "    ./deploy.sh rispd rispd.pyramidchallenges.com. aeZ87sVkkdjfs askdf832ls97smvms8o"
     echo -e "${COLOR_NONE}"
     exit 2
   fi
 else
-  AWS_ACCESS_KEY=$2
-  AWS_SECRET_KEY=$3
+  AWS_ACCESS_KEY=$3
+  AWS_SECRET_KEY=$4
   if [ ! -f ~/.aws/credentials ]; then
     mkdir ~/.aws | true
     touch ~/.aws/credentials
@@ -78,6 +90,7 @@ pulumi config set cloud:provider aws
 pulumi config set aws:region us-east-2
 pulumi config set cloud-aws:useFargate true
 pulumi config set jenkins:projectName $PROJECT_NAME
+pulumi config set jenkins:hostedZoneName $HOSTED_ZONE_NAME
 pulumi config set jenkins:AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY --secret
 pulumi config set jenkins:AWS_SECRET_ACCESS_KEY $AWS_SECRET_KEY --secret
 

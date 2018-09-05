@@ -2,6 +2,7 @@ const pulumi = require('@pulumi/pulumi');
 const aws = require('@pulumi/aws');
 let config = new pulumi.Config('jenkins');
 let projectName = config.require('projectName')
+let hostedZoneName = config.require('hostedZoneName')
 let awsAccessKey = config.require('AWS_ACCESS_KEY_ID');
 let awsSecretKey = config.require('AWS_SECRET_ACCESS_KEY');
 
@@ -82,12 +83,13 @@ echo "export PROJECT_NAME=${projectName}" | sudo tee --append /etc/profile
 # Configure Jenkins using the Jenkins CLI
 wget http://localhost:8080/jnlpJars/jenkins-cli.jar
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureJenkins.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPassword.sh
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureNetworking.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/updateRoute53.sh
-sudo chmod 755 configureJenkins.sh configureNetworking.sh printJenkinsPassword.sh
+wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureSsl.sh
+wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPassword.sh
+sudo chmod 755 configureJenkins.sh configureNetworking.sh configureSsl.sh printJenkinsPassword.sh
 ./configureJenkins.sh
-./configureNetworking.sh ${projectName} rispd.pyramidchallenges.com.
+./configureNetworking.sh ${projectName} ${hostedZoneName}
+./configureSsl.sh ${hostedZoneName}
 
 # Restart services
 sudo service jenkins restart
