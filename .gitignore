@@ -1,3 +1,3 @@
 node_modules
 Pulumi.*-jenkins.yaml
-selenium/logs/*
+selenium/logs/*.log
