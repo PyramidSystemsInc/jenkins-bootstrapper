@@ -7,11 +7,16 @@ Creates an AWS EC2 instance running Jenkins configured to run build jobs and run
 ### Features
 
 - [X] Creates an EC2 instance running Jenkins with a single script
-- [X] Copies files from an S3 bucket to the Jenkins EC2 instance to ensure private data stays private
-- [X] Creates jobs programmatically based on a JSON config file
+- [X] Copies files from an S3 bucket matching the project's name to the Jenkins EC2 instance
+- [X] Creates Jenkins jobs programmatically based on a JSON configuration file found in the S3 bucket
+- [X] Installs Jenkins plugins automatically and bypasses the Jenkins startup wizard
 - [X] Creates necessary credentials in Jenkins from the JSON configuration file
-- [ ] Stands up a Selenium grid in ECS, setup as Jenkins slaves, for distributed test execution
-- [ ] Runs Sonarqube plugin on Jenkins to output clean HTML reports of the health of the application(s) being built by Jenkins
+- [X] Stands up a Selenium grid in ECS, accessible from Jenkins, for distributed test execution
+- [X] Automatically updates GitHub webhooks for all the projects being built in Jenkins
+- [X] Updates or creates records in the Route53 hosted zone provided for Jenkins and Selenium
+- [X] Uses NGINX and Certbot/Let's Encrypt to enable SSL
+- [ ] Stands up a Sonarqube server in ECS to output clean HTML reports of the health of the application(s) being built by Jenkins
+- [ ] Creates the provided Route53 hosted zone if it does not exist
 - [ ] Supports various post-build actions (i.e. email confirmation for builds)
 - [ ] Features clean output of the `./deploy.sh` script
 - [ ] Features a script to create the `jobs.json` configuration file using command line input
@@ -20,7 +25,6 @@ Creates an AWS EC2 instance running Jenkins configured to run build jobs and run
 
 * AWS account with credentials
 * [AWS CLI installed](https://docs.aws.amazon.com/cli/latest/userguide/installing.html)
-* [Pulumi installed](https://pulumi.io/quickstart/install.html)
 
 ### Usage
 
@@ -30,20 +34,20 @@ Creates an AWS EC2 instance running Jenkins configured to run build jobs and run
 
 3. Upload your new `jobs.json` file to your S3 bucket
 
+4. Ensure a hosted zone is created in Route53
+
 4. Deploy a working Jenkins with the following command:
 
-`./deploy <PROJECT_NAME>`
+`./deploy <PROJECT_NAME> <EXISTING_AWS_HOSTED_ZONE_NAME>`
 
 -OR-
 
-`./deploy <PROJECT_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>`
+`./deploy <PROJECT_NAME> <EXISTING_AWS_HOSTED_ZONE_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>`
 
 For example:
 
-`./deploy rispd`
+`./deploy rispd rispd.pyramidchallenges.com.`
 
 -OR-
 
-`./deploy sample-project skjdfklsdj 239lassfaskjf993ksjdfk`
-
-5. Add the necessary webhooks to your new Jenkins instance on [GitHub's website](https://github.com/)
+`./deploy sample-project project.sample.com. skjdfklsdj 239lassfaskjf993ksjdfk`
