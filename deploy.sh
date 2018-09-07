@@ -62,50 +62,39 @@ else
   fi
 fi
 
+# Create Jenkins EC2 Instance
+./jenkins/userDataGenerator.sh $PROJECT_NAME $HOSTED_ZONE_NAME $AWS_ACCESS_KEY $AWS_SECRET_KEY
+./jenkins/createInstance.sh $PROJECT_NAME
+
 # Start Selenium Grid
 cd selenium
 rm -f logs/clusterCreate.log logs/taskCreate.log
 ./deploy.sh $PROJECT_NAME >logs/clusterCreate.log 2>logs/taskCreate.log &
 cd ..
 
-# Install Pulumi dependencies
-npm install
+# Create JENKINS_ID variable
+# JENKINS_ID=$PROJECT_NAME-jenkins
 
-# Setup Pulumi
-pulumi stack init $PROJECT_NAME-jenkins
-pulumi stack select $PROJECT_NAME-jenkins
-pulumi config set cloud:provider aws
-pulumi config set aws:region us-east-2
-pulumi config set cloud-aws:useFargate true
-pulumi config set jenkins:projectName $PROJECT_NAME
-pulumi config set jenkins:hostedZoneName $HOSTED_ZONE_NAME
-pulumi config set jenkins:AWS_ACCESS_KEY_ID $AWS_ACCESS_KEY --secret
-pulumi config set jenkins:AWS_SECRET_ACCESS_KEY $AWS_SECRET_KEY --secret
-
-# Launch EC2 instance
-pulumi update -y
-
-# Cleanup
-rm Pulumi.$PROJECT_NAME-jenkins.yaml
+# Print notices and warnings
+# echo -e "${COLOR_WHITE}NOTICE: Logging into Jenkins EC2 instance with the command:"
+# echo -e "    ssh -i ~/Desktop/$JENKINS_ID.pem ec2-user@$EC2_IP"
+# echo -e "${COLOR_NONE}"
+# echo -e "${COLOR_YELLOW}WARNING: The instance is still being configured so don't freak out if your stuff isn't there yet"
+# echo -e "         You can monitor its progress by running in the instance:"
+# echo -e "${COLOR_WHITE}    tail -f installProgress"
+# echo -e "${COLOR_NONE}"
+# echo -e "${COLOR_WHITE}NOTICE: Once the instance is done being configured, you can reach Jenkins at the following address in your browser:"
+# echo -e "    $EC2_IP:8080"
+# echo -e "${COLOR_NONE}"
+# echo -e "${COLOR_WHITE}NOTICE: This is the webhook URL that must be pasted in to the Payload URL field on GitHub:"
+# echo -e "    http://$EC2_IP:8080/github-webhook/"
+# echo -e "${COLOR_NONE}"
+# echo -e "${COLOR_WHITE}NOTICE: If navigating to the Jenkins web GUI, enter the username \"admin\""
+# echo -e "        The password can be found by running ./printJenkinsPassword.sh located in the home directory of the EC2 instance"
+# echo -e "${COLOR_NONE}"
 
 # Login to EC2 instance
-EC2_IP=$(pulumi stack output ipAddress)
-echo -e "${COLOR_WHITE}NOTICE: Logging into Jenkins EC2 instance with the command:"
-echo -e "    ssh -i ~/Desktop/$PROJECT_NAME-jenkins.pem ec2-user@$EC2_IP"
-echo -e "${COLOR_NONE}"
-echo -e "${COLOR_YELLOW}WARNING: The instance is still being configured so don't freak out if your stuff isn't there yet"
-echo -e "         It should finish configuring itself in about a minute and a half"
-echo -e "${COLOR_NONE}"
-echo -e "${COLOR_WHITE}NOTICE: Once the instance is done being configured, you can reach Jenkins at the following address in your browser:"
-echo -e "    $EC2_IP:8080"
-echo -e "${COLOR_NONE}"
-echo -e "${COLOR_WHITE}NOTICE: This is the webhook URL that must be pasted in to the Payload URL field on GitHub:"
-echo -e "    http://$EC2_IP:8080/github-webhook/"
-echo -e "${COLOR_NONE}"
-echo -e "${COLOR_WHITE}NOTICE: After navigating to the URL above, enter the username \"admin\""
-echo -e "        The password can be found by running ./printJenkinsPassword.sh located in the home directory of the EC2 instance"
-echo -e "${COLOR_NONE}"
-sleep 12
-ssh -i ~/Desktop/$PROJECT_NAME-jenkins.pem ec2-user@$EC2_IP 'echo "" | sudo -Sv && bash -s' < scripts/changeMotd.sh >> /dev/null
-sleep 1
-ssh -i ~/Desktop/$PROJECT_NAME-jenkins.pem ec2-user@$EC2_IP
+# sleep 12
+# ssh -i ~/Desktop/$JENKINS_ID.pem ec2-user@$EC2_IP 'echo "" | sudo -Sv && bash -s' < jenkins/changeMotd.sh >> /dev/null
+# sleep 1
+# ssh -i ~/Desktop/$JENKINS_ID.pem ec2-user@$EC2_IP

@@ -1,8 +1,3 @@
-#!/bin/bash
-
-# TODO
-# [ ] Figure out how to get parameters in a user data script
-
 # Install Java 8
 sudo yum update -y
 sudo yum remove java-1.7.0-openjdk -y
@@ -43,35 +38,35 @@ sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-
 sudo chmod +x /usr/local/bin/ecs-cli
 
 # Store AWS Credentials for root
-export AWS_ACCESS_KEY_ID=${awsAccessKey}
-export AWS_SECRET_ACCESS_KEY=${awsSecretKey}
+export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY
+export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_KEY
 
 # Store AWS Credentials for Jenkins
 sudo mkdir -p /var/lib/jenkins/.aws
 sudo touch /var/lib/jenkins/.aws/credentials
 echo "[default]" | sudo tee --append /var/lib/jenkins/.aws/credentials
-echo "aws_access_key_id = ${awsAccessKey}" | sudo tee --append /var/lib/jenkins/.aws/credentials
-echo "aws_secret_access_key = ${awsSecretKey}" | sudo tee --append /var/lib/jenkins/.aws/credentials
+echo "aws_access_key_id = $AWS_ACCESS_KEY" | sudo tee --append /var/lib/jenkins/.aws/credentials
+echo "aws_secret_access_key = $AWS_SECRET_KEY" | sudo tee --append /var/lib/jenkins/.aws/credentials
 
 # Store AWS Credentials for ec2-user
 sudo mkdir -p /home/ec2-user/.aws
 sudo touch /home/ec2-user/.aws/credentials
 echo "[default]" | sudo tee --append /home/ec2-user/.aws/credentials
-echo "aws_access_key_id = ${awsAccessKey}" | sudo tee --append /home/ec2-user/.aws/credentials
-echo "aws_secret_access_key = ${awsSecretKey}" | sudo tee --append /home/ec2-user/.aws/credentials
+echo "aws_access_key_id = $AWS_ACCESS_KEY" | sudo tee --append /home/ec2-user/.aws/credentials
+echo "aws_secret_access_key = $AWS_SECRET_KEY" | sudo tee --append /home/ec2-user/.aws/credentials
 
 # Start Jenkins
 sudo service jenkins start
 
 # Download all files from an S3 bucket matching the PROJECT_NAME (assumes jobs.json is found in this bucket)
-aws s3 sync s3://${projectName} /home/ec2-user/
+aws s3 sync s3://$PROJECT_NAME /home/ec2-user/
 
 # Ensure Jenkins was started by waiting
 cd /home/ec2-user
 sleep 30
 
 # Set environment variables
-echo "export PROJECT_NAME=${projectName}" | sudo tee --append /etc/profile
+echo "export PROJECT_NAME=$PROJECT_NAME" | sudo tee --append /etc/profile
 . /etc/profile
 
 # Configure Jenkins using the Jenkins CLI
@@ -83,9 +78,9 @@ wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureGitHubWebh
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPassword.sh
 sudo chmod 755 configureJenkins.sh configureNetworking.sh configureSsl.sh configureGitHubWebhooks.sh printJenkinsPassword.sh
 ./configureJenkins.sh
-./configureNetworking.sh ${projectName} ${hostedZoneName}
-./configureSsl.sh ${hostedZoneName}
-./configureGitHubWebhooks.sh ${hostedZoneName}
+./configureNetworking.sh $PROJECT_NAME $HOSTED_ZONE_NAME
+#./configureSsl.sh $HOSTED_ZONE_NAME
+./configureGitHubWebhooks.sh $HOSTED_ZONE_NAME
 
 # Restart services
 sudo service jenkins restart

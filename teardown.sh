@@ -41,16 +41,21 @@ rm -f logs/teardown.log
 ./teardown.sh $PROJECT_NAME 2>logs/teardown.log &
 cd ..
 
+# Create JENKINS_ID variable
+JENKINS_ID=$PROJECT_NAME-jenkins
+
 # Delete key pair
-sudo rm ~/Desktop/$PROJECT_NAME-jenkins.pem
-aws --region us-east-2 ec2 delete-key-pair --key-name $PROJECT_NAME-jenkins
+sudo rm ~/Desktop/$JENKINS_ID.pem
+aws --region us-east-2 ec2 delete-key-pair --key-name $JENKINS_ID
 
-# Terminate EC2 instance
-pulumi stack select $PROJECT_NAME-jenkins
-pulumi config set cloud:provider aws
-pulumi config set aws:region us-east-2
-pulumi config set cloud-aws:useFargate true
-pulumi destroy -y
-
-# Cleanup
-rm Pulumi.$PROJECT_NAME-jenkins.yaml
+# Terminate any running EC2 instances and any security groups named $JENKINS_ID
+INSTANCE_COUNT=$(aws ec2 describe-instances | jq '.Reservations[0].Instances | length')
+for (( INSTANCE_INDEX=0; INSTANCE_INDEX<INSTANCE_COUNT; INSTANCE_INDEX++ )) do
+  if [ $(aws ec2 describe-instances | jq '.Reservations[0].Instances['"$INSTANCE_INDEX"'].State.Name') == "\"running\"" ]; then
+    if [ $(aws ec2 describe-instances | jq '.Reservations[0].Instances['"$INSTANCE_INDEX"'].KeyName') == "\"$JENKINS_ID\"" ]; then
+      INSTANCE_ID=$(sed -e 's/^"//' -e 's/"$//' <<< $(aws ec2 describe-instances | jq '.Reservations[0].Instances['"$INSTANCE_INDEX"'].InstanceId'))
+      aws ec2 terminate-instances --instance-ids $INSTANCE_ID
+      aws ec2 delete-security-group --group-name $JENKINS_ID
+    fi
+  fi
+done
