@@ -34,27 +34,27 @@ EOF
 
 # Get a list of unique Git URLs from the jobs.json file
 JOB_COUNT=$(cat jobs.json | jq '.jobs | length')
-GIT_URLS=()
+GITHUB_URLS=()
 for (( JOB_INDEX=0; JOB_INDEX<JOB_COUNT; JOB_INDEX++ )) do
-  GIT_URL=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].git.url'))
-  GIT_URL_COUNT=${#GIT_URLS[@]}
-  GIT_URL_UNIQUE=true
-  for (( GIT_URL_INDEX=0; GIT_URL_INDEX<GIT_URL_COUNT; GIT_URL_INDEX++ )) do
-    if [ ${GIT_URLS[$GIT_URL_INDEX]} == $GIT_URL ]; then
-      GIT_URL_UNIQUE=false
+  GITHUB_URL=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].git.url'))
+  GITHUB_URL_COUNT=${#GITHUB_URLS[@]}
+  GITHUB_URL_UNIQUE=true
+  for (( GITHUB_URL_INDEX=0; GITHUB_URL_INDEX<GITHUB_URL_COUNT; GITHUB_URL_INDEX++ )) do
+    if [ ${GITHUB_URLS[$GITHUB_URL_INDEX]} == $GITHUB_URL ]; then
+      GITHUB_URL_UNIQUE=false
     fi
   done
-  if [ $GIT_URL_UNIQUE == true ]; then
-    GIT_URLS+=($GIT_URL)
+  if [ $GITHUB_URL_UNIQUE == true ]; then
+    GITHUB_URLS+=($GITHUB_URL)
+    GITHUB_USERNAME=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].git.credentials.username'))
+    GITHUB_PASSWORD=$(sed -e 's/^"//' -e 's/"$//' <<< $(cat jobs.json | jq '.jobs['"$JOB_INDEX"'].git.credentials.password'))
+    GITHUB_REPOSITORY=$(sed -e 's/^https:\/\/github.com\///' -e 's/.git$//' <<< $(echo $GITHUB_URL))
+    if [ $GITHUB_USERNAME == "null" ]; then
+      curl -X POST -d @/home/ec2-user/webhook.json https://api.github.com/repos/$GITHUB_REPOSITORY/hooks
+    else
+      curl -X POST -d @/home/ec2-user/webhook.json -u $GITHUB_USERNAME:$GITHUB_PASSWORD https://api.github.com/repos/$GITHUB_REPOSITORY/hooks
+    fi
   fi
-done
-echo ${GIT_URLS[@]}
-
-# For each unique Git URL in the jobs.json file, create a webhook to jenkins.<HOSTED_ZONE_NAME>
-GIT_URL_COUNT=${#GIT_URLS[@]}
-for (( GIT_URL_INDEX=0; GIT_URL_INDEX<GIT_URL_COUNT; GIT_URL_INDEX++ )) do
-  # WHERE I LEFT OFF
-  # curl -X POST -d @/home/ec2-user/webhook.json -u $GITHUB_USERNAME:$GITHUB_PASSWORD https://api.github.com/repos/$GITHUB_REPOSITORY/hooks
 done
 
 rm /home/ec2-user/webhook.json

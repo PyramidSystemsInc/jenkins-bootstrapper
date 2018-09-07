@@ -85,18 +85,20 @@ wget http://localhost:8080/jnlpJars/jenkins-cli.jar
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureJenkins.sh
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureNetworking.sh
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureSsl.sh
+wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureGitHubWebhooks.sh
 wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPassword.sh
-sudo chmod 755 configureJenkins.sh configureNetworking.sh configureSsl.sh printJenkinsPassword.sh
+sudo chmod 755 configureJenkins.sh configureNetworking.sh configureSsl.sh configureGitHubWebhooks.sh printJenkinsPassword.sh
 ./configureJenkins.sh
 ./configureNetworking.sh ${projectName} ${hostedZoneName}
 ./configureSsl.sh ${hostedZoneName}
+./configureGitHubWebhooks.sh ${hostedZoneName}
 
 # Restart services
 sudo service jenkins restart
 sudo service nginx restart
 `;
 
-let size = 't2.medium';
+let size = 't3.medium';
 let ami = 'ami-40142d25';
 let id = projectName + '-jenkins';
 

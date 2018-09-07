@@ -118,4 +118,6 @@ echo -e "${COLOR_WHITE}NOTICE: After navigating to the URL above, enter the user
 echo -e "        The password can be found by running ./printJenkinsPassword.sh located in the home directory of the EC2 instance"
 echo -e "${COLOR_NONE}"
 sleep 12
+ssh -i ~/Desktop/$PROJECT_NAME-jenkins.pem ec2-user@$EC2_IP 'echo "" | sudo -Sv && bash -s' < util/changeMotd.sh >> /dev/null
+sleep 1
 ssh -i ~/Desktop/$PROJECT_NAME-jenkins.pem ec2-user@$EC2_IP
