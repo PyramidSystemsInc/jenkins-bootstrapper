@@ -49,13 +49,19 @@ sudo rm ~/Desktop/$JENKINS_ID.pem
 aws --region us-east-2 ec2 delete-key-pair --key-name $JENKINS_ID
 
 # Terminate any running EC2 instances and any security groups named $JENKINS_ID
-INSTANCE_COUNT=$(aws ec2 describe-instances | jq '.Reservations[0].Instances | length')
+INSTANCE_COUNT=$(aws ec2 describe-instances --filter Name=instance-state-code,Values=16 | jq '.Reservations[0].Instances | length')
 for (( INSTANCE_INDEX=0; INSTANCE_INDEX<INSTANCE_COUNT; INSTANCE_INDEX++ )) do
-  if [ $(aws ec2 describe-instances | jq '.Reservations[0].Instances['"$INSTANCE_INDEX"'].State.Name') == "\"running\"" ]; then
-    if [ $(aws ec2 describe-instances | jq '.Reservations[0].Instances['"$INSTANCE_INDEX"'].KeyName') == "\"$JENKINS_ID\"" ]; then
-      INSTANCE_ID=$(sed -e 's/^"//' -e 's/"$//' <<< $(aws ec2 describe-instances | jq '.Reservations[0].Instances['"$INSTANCE_INDEX"'].InstanceId'))
-      aws ec2 terminate-instances --instance-ids $INSTANCE_ID
-      aws ec2 delete-security-group --group-name $JENKINS_ID
-    fi
+  if [ $(aws ec2 describe-instances --filter Name=instance-state-code,Values=16 | jq '.Reservations[0].Instances['"$INSTANCE_INDEX"'].KeyName') == "\"$JENKINS_ID\"" ]; then
+    INSTANCE_ID=$(sed -e 's/^"//' -e 's/"$//' <<< $(aws ec2 describe-instances --filter Name=instance-state-code,Values=16 | jq '.Reservations[0].Instances['"$INSTANCE_INDEX"'].InstanceId'))
+    aws ec2 terminate-instances --instance-ids $INSTANCE_ID
+  fi
+done
+
+# Wait until the instance and volume are terminated to delete the security group
+INSTANCE_SHUTTING_DOWN=true
+while [ "$INSTANCE_SHUTTING_DOWN" == true ]; do
+  if [ "$(aws ec2 describe-instances --instance-id $INSTANCE_ID --filter Name=instance-state-code,Values=48 | jq '.Reservations[0].Instances[0]')" != "null" ]; then
+    INSTANCE_SHUTTING_DOWN=false
+    aws ec2 delete-security-group --group-name $JENKINS_ID
   fi
 done

@@ -17,9 +17,11 @@ DOMAIN=$(sed -e 's/.$//' <<< $(echo jenkins.$HOSTED_ZONE_NAME))
 cd /home/ec2-user
 wget https://dl.eff.org/certbot-auto
 chmod a+x certbot-auto
+echo "DOWNLOAD_CERTBOT=true" | sudo tee --append /configurationProgress.sh
 
 # Get certificates from Certbot (valid for 60 days)
 sudo ./certbot-auto --nginx --debug -n --agree-tos --email jdiederiks@psi-it.com --domains $DOMAIN
+echo "GET_CERTS=true" | sudo tee --append /configurationProgress.sh
 
 # Replace NGINX config file
 sudo rm /etc/nginx/nginx.conf
@@ -77,3 +79,5 @@ http {
 w
 q
 EOF
+echo "REPLACE_NGINX_CONFIG=true" | sudo tee --append /configurationProgress.sh
+echo "SSL_CONFIGURED=true" | sudo tee --append /configurationProgress.sh

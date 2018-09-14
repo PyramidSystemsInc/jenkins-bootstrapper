@@ -40,6 +40,7 @@ for (( INSTANCE_INDEX=0; INSTANCE_INDEX<INSTANCE_COUNT; INSTANCE_INDEX++ )) do
     fi
   fi
 done
+echo "ADD_SELENIUM_TO_HOSTS=true" | sudo tee --append /configurationProgress.sh
 
 # Find the existing hosted zone ID of the hosted zone name provided
 HOSTED_ZONES=$(aws route53 list-hosted-zones)
@@ -51,11 +52,13 @@ for (( HOSTED_ZONE_INDEX=0; HOSTED_ZONE_INDEX<HOSTED_ZONES_COUNT; HOSTED_ZONE_IN
     HOSTED_ZONE_ID=$(sed -e 's/^"//' -e 's/"$//' <<< $(echo $HOSTED_ZONE | jq '.Id'))
   fi
 done
+echo "FIND_HOSTED_ZONE_ID=true" | sudo tee --append /configurationProgress.sh
 
 # If the hosted zone was not found, alert the user and exit
 if [ -z $HOSTED_ZONE_ID ]; then
   echo -e "${COLOR_RED}ERROR: Hosted zone was not found. The trailing '.' is required${COLOR_NONE}"
   echo ""
+  echo "NETWORKING_CONFIGURED=false" | sudo tee --append /configurationProgress.sh
   exit 2
 fi
 
@@ -80,11 +83,14 @@ JENKINS_CHANGE_BATCH=$(jq -n --arg jenkinsRecordName "$JENKINS_RECORD_NAME" --ar
   ]
 }')
 aws route53 change-resource-record-sets --hosted-zone $HOSTED_ZONE_ID --change-batch "$JENKINS_CHANGE_BATCH"
+echo "CREATE_JENKINS_RECORD=true" | sudo tee --append /configurationProgress.sh
 
 # If a Selenium IP was found above, create/update a record in the hosted zone for selenium.<HOSTED_ZONE_NAME>
 if [ -z $SELENIUM_IP ]; then
   echo -e "${COLOR_RED}ERROR: The Selenium instance's IP address could not be found"
   echo "${COLOR_NONE}"
+  echo "CREATE_SELENIUM_RECORD=false" | sudo tee --append /configurationProgress.sh
+  echo "NETWORKING_CONFIGURED=false" | sudo tee --append /configurationProgress.sh
 else
   SELENIUM_RECORD_NAME="selenium.$TARGET_HOSTED_ZONE_NAME"
   SELENIUM_CHANGE_BATCH=$(jq -n --arg seleniumRecordName "$SELENIUM_RECORD_NAME" --arg seleniumIp "$SELENIUM_IP" '{
@@ -105,4 +111,6 @@ else
     ]
   }')
   aws route53 change-resource-record-sets --hosted-zone $HOSTED_ZONE_ID --change-batch "$SELENIUM_CHANGE_BATCH"
+  echo "CREATE_SELENIUM_RECORD=true" | sudo tee --append /configurationProgress.sh
+  echo "NETWORKING_CONFIGURED=true" | sudo tee --append /configurationProgress.sh
 fi

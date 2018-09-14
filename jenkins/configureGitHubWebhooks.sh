@@ -31,8 +31,9 @@ i
 .
 w
 EOF
+echo "CREATE_PAYLOAD=true" | sudo tee --append /configurationProgress.sh
 
-# Get a list of unique Git URLs from the jobs.json file
+# Create a webhook for each unique URL in the jobs.json file
 JOB_COUNT=$(cat jobs.json | jq '.jobs | length')
 GITHUB_URLS=()
 for (( JOB_INDEX=0; JOB_INDEX<JOB_COUNT; JOB_INDEX++ )) do
@@ -56,5 +57,7 @@ for (( JOB_INDEX=0; JOB_INDEX<JOB_COUNT; JOB_INDEX++ )) do
     fi
   fi
 done
+echo "CREATE_WEBHOOKS=true" | sudo tee --append /configurationProgress.sh
 
 rm /home/ec2-user/webhook.json
+echo "GITHUB_WEBHOOKS_CONFIGURED=true" | sudo tee --append /configurationProgress.sh

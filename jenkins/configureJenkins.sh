@@ -1,17 +1,23 @@
 #! /bin/bash
 
+# Download Jenkins CLI Jar
+cd /home/ec2-user
+wget http://localhost:8080/jnlpJars/jenkins-cli.jar
+
 # Avoid Jenkins setup wizard
 sudo sed -i 's#<installStateName>NEW.*#<installStateName>RUNNING<\/installStateName>#g' /var/lib/jenkins/config.xml
+echo "BYPASS_WIZARD=true" | sudo tee --append /configurationProgress.sh
 
 # Install necessary Jenkins plugins (these plugins have dependencies which get downloaded and installed as well)
-cd /home/ec2-user
 JENKINS_PASSWORD=$(./printJenkinsPassword.sh)
 java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin git
 java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin github
+echo "INSTALL_PLUGINS=true" | sudo tee --append /configurationProgress.sh
 
 # Restart Jenkins to complete the installation of the plugins, then ensure Jenkins is up before continuing
 sudo service jenkins restart
 sleep 70
+echo "RESTART_JENKINS=true" | sudo tee --append /configurationProgress.sh
 
 # Create native Jenkins job template XML files from jobs.json and use the new XML file to create a Jenkins job
 JOB_COUNT=$(cat jobs.json | jq '.jobs | length')
@@ -96,3 +102,6 @@ for (( JOB_INDEX=0; JOB_INDEX<$JOB_COUNT; JOB_INDEX++)); do
   java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD create-job $JOB_NAME < $JOB_NAME.xml
   rm $JOB_NAME.xml
 done
+echo "CREATE_JOBS=true" | sudo tee --append /configurationProgress.sh
+
+echo "JENKINS_CONFIGURED=true" | sudo tee --append /configurationProgress.sh
