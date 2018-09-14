@@ -22,7 +22,7 @@ Creates an AWS EC2 instance running Jenkins and several ECS clusters configured 
 - [X] Copies files from an S3 bucket matching the project's name to the Jenkins EC2 instance (if it exists)
 - [X] Uses NGINX and Certbot/Let's Encrypt to enable SSL
 - [X] Features clean output to monitor the configuration process of the Jenkins instance
-- [ ] Features a useful "help command" and meaningful error messages
+- [X] Features a useful "help command" and meaningful error messages
 - [ ] Supports various post-build actions (i.e. email confirmation for successful builds)
 - [ ] Features a script to create the `jobs.json` configuration file using step-by-step command line input
 - [ ] Allows parameterized builds (somehow)

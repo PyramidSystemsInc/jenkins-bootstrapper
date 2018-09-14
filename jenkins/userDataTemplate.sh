@@ -10,10 +10,10 @@ wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPasswor
 sudo chmod 755 saveVariablesCredentials.sh installPackages.sh configureJenkins.sh configureNetworking.sh configureSsl.sh configureGitHubWebhooks.sh printJenkinsPassword.sh
 
 # Run scripts to configure Jenkins
-./saveVariablesCredentials.sh $PROJECT_NAME "$JOBS" $AWS_ACCESS_KEY $AWS_SECRET_KEY
+./saveVariablesCredentials.sh $PROJECT_NAME "$JOBS"
 ./installPackages.sh
 ./configureJenkins.sh
-./configureNetworking.sh $PROJECT_NAME $HOSTED_ZONE_NAME $AWS_ACCESS_KEY $AWS_SECRET_KEY
+./configureNetworking.sh $PROJECT_NAME $HOSTED_ZONE_NAME
 if [ "$CONFIGURE_SSL" == "true" ]; then
   ./configureSsl.sh $HOSTED_ZONE_NAME &
 else
