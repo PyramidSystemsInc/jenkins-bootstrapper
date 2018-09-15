@@ -90,7 +90,7 @@ fi
 # Ensure a project name is provided
 if [ -z "$PROJECT_NAME" ]; then
   echo -e "${COLOR_RED}ERROR: Project name must be provided. Please re-run as follows:${COLOR_NONE}"
-  echo -e "${COLOR_WHITE}    ./deploy.sh -p <PROJECT_NAME> -j <JOBS_FILE_LOCATION>"
+  echo -e "${COLOR_WHITE}    ./deploy.sh -p <PROJECT_NAME> -j <JOBS_FILE_LOCATION> -i <EXISTING_AWS_IAM_ROLE>"
   echo -e "    -OR-"
   echo -e "    ./deploy.sh --help"
   echo -e "${COLOR_NONE}"
@@ -100,7 +100,17 @@ fi
 # Ensure a jobs.json is provided
 if [ -z "$JOBS" ] || [ $(echo $JOBS | jq '.jobs | length') -lt 1 ]; then
   echo -e "${COLOR_RED}ERROR: Jenkins jobs (jobs.json) must be provided. Please re-run as follows:${COLOR_NONE}"
-  echo -e "${COLOR_WHITE}    ./deploy.sh -p <PROJECT_NAME> -j <JOBS_FILE_LOCATION>"
+  echo -e "${COLOR_WHITE}    ./deploy.sh -p <PROJECT_NAME> -j <JOBS_FILE_LOCATION> -i <EXISTING_AWS_IAM_ROLE>"
+  echo -e "    -OR-"
+  echo -e "    ./deploy.sh --help"
+  echo -e "${COLOR_NONE}"
+  exit 2
+fi
+
+# Ensure an IAM role is provided
+if [ -z "$AWS_IAM_ROLE" ]; then
+  echo -e "${COLOR_RED}ERROR: AWS IAM role for the new Jenkins instance must be provided. Please re-run as follows:${COLOR_NONE}"
+  echo -e "${COLOR_WHITE}    ./deploy.sh -p <PROJECT_NAME> -j <JOBS_FILE_LOCATION> -i <EXISTING_AWS_IAM_ROLE>"
   echo -e "    -OR-"
   echo -e "    ./deploy.sh --help"
   echo -e "${COLOR_NONE}"
@@ -154,7 +164,7 @@ fi
 if [ "$DEPLOY_SELENIUM" == "true" ]; then
   cd selenium
   rm -f logs/clusterCreate.log logs/taskCreate.log
-  ./deploy.sh $PROJECT_NAME >logs/clusterCreate.log 2>logs/taskCreate.log &
+  ./deploy.sh $PROJECT_NAME $AWS_ACCESS_KEY $AWS_SECRET_KEY >logs/clusterCreate.log 2>logs/taskCreate.log &
   cd ..
 fi
 
