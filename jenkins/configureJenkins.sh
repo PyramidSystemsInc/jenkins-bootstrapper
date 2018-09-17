@@ -12,6 +12,7 @@ echo "BYPASS_WIZARD=true" | sudo tee --append /configurationProgress.sh
 JENKINS_PASSWORD=$(./printJenkinsPassword.sh)
 java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin git
 java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin github
+java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin amazon-ecs
 echo "INSTALL_PLUGINS=true" | sudo tee --append /configurationProgress.sh
 
 # Restart Jenkins to complete the installation of the plugins, then ensure Jenkins is up before continuing

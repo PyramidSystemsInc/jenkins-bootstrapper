@@ -1,0 +1,38 @@
+// config.xml
+
+
+  <clouds>
+    <com.cloudbees.jenkins.plugins.amazonecs.ECSCloud plugin="amazon-ecs@1.16">
+      <name>AWS</name>
+      <credentialsId>56d04a2c-4f92-4f9d-a053-58c732aed97d</credentialsId>
+      <cluster>arn:aws:ecs:us-east-2:118104210923:cluster/rispd-jenkins-slaves</cluster>
+      <regionName>us-east-2</regionName>
+      <tunnel></tunnel>
+      <jenkinsUrl>http://jenkins.rispd.pyramidchallenges.com:8080/</jenkinsUrl>
+      <slaveTimoutInSeconds>900</slaveTimoutInSeconds>
+    </com.cloudbees.jenkins.plugins.amazonecs.ECSCloud>
+  </clouds>
+
+
+// credentials.xml
+
+        <com.cloudbees.jenkins.plugins.awscredentials.AWSCredentialsImpl plugin="aws-credentials@1.23">
+          <scope>GLOBAL</scope>
+          <id>56d04a2c-4f92-4f9d-a053-58c732aed97d</id>
+          <description></description>
+          <accessKey>...
+          <secretKey>...
+          <iamRoleArn></iamRoleArn>
+          <iamMfaSerialNumber></iamMfaSerialNumber>
+        </com.cloudbees.jenkins.plugins.awscredentials.AWSCredentialsImpl>
+
+
+// At <JENKINS_URL>/script
+println(hudson.util.Secret.fromString("I done be encrypted").getEncryptedValue())
+println(hudson.util.Secret.decrypt("{AQAAABAAAAAgRZQIVgSHMjC1ANeEhBKbIwVfG2FCAgFIbDive4WpoZImXyRg/+G2UexKVCDS2Uq+}"))
+
+// To encrypt
+echo $(curl -H "$(curl -s 'http://admin:fc9f473fcf1a418089b6694de5cba613@localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')" -d "script=println(hudson.util.Secret.fromString(\"I done be encrypted\").getEncryptedValue())" admin:fc9f473fcf1a418089b6694de5cba613@localhost:8080/script) | grep -o '<h2>Result</h2>.*</pre>' | grep -o '{.*}'
+
+// To decrypt
+echo $(curl -H "$(curl -s 'http://admin:fc9f473fcf1a418089b6694de5cba613@localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')" -d 'script=println(hudson.util.Secret.decrypt("{AQAAABAAAAAgRZQIVgSHMjC1ANeEhBKbIwVfG2FCAgFIbDive4WpoZImXyRg/+G2UexKVCDS2Uq+}"))' admin:fc9f473fcf1a418089b6694de5cba613@localhost:8080/script) | grep -o '<h2>Result</h2>.*</pre>'
