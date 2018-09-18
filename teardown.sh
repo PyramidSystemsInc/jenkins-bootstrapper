@@ -41,6 +41,12 @@ rm -f logs/teardown.log
 ./teardown.sh $PROJECT_NAME 2>logs/teardown.log &
 cd ..
 
+# Destroy Jenkins Slaves ECS cluster / CloudFormation stack
+cd slaves
+rm -f logs/teardown.log
+./teardown.sh $PROJECT_NAME 2>logs/teardown.log &
+cd ..
+
 # Create JENKINS_ID variable
 JENKINS_ID=$PROJECT_NAME-jenkins
 

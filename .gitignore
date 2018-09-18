@@ -1,5 +1,5 @@
-node_modules
-Pulumi.*-jenkins.yaml
-selenium/logs/*.log
 jenkins/userData.sh
+node_modules
 secret/
+selenium/logs/*.log
+slaves/logs/*.log

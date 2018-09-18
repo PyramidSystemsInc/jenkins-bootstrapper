@@ -25,23 +25,6 @@ else
   TARGET_HOSTED_ZONE_NAME=$2
 fi
 
-# Find the public IP address of the Selenium grid and add it to the hosts file as "selenium"
-INSTANCES_DESCRIPTION=$(aws ec2 --region us-east-2 describe-instances)
-INSTANCE_COUNT=$(echo $INSTANCES_DESCRIPTION | jq '.Reservations | length')
-for (( INSTANCE_INDEX=0; INSTANCE_INDEX<INSTANCE_COUNT; INSTANCE_INDEX++ )) do
-  INSTANCE_DESCRIPTION=$(echo $INSTANCES_DESCRIPTION | jq '.Reservations['"$INSTANCE_INDEX"'].Instances[0]')
-  INSTANCE_STATE=$(echo $INSTANCE_DESCRIPTION | jq '.State.Name')
-  if [ $INSTANCE_STATE == '"running"' ]; then
-    INSTANCE_KEY=$(sed -e 's/^"//' -e 's/"$//' <<< $(echo $INSTANCE_DESCRIPTION | jq '.KeyName'))
-    SELENIUM_KEY=$PROJECT_NAME-selenium
-    if [ $INSTANCE_KEY == $SELENIUM_KEY ]; then
-      SELENIUM_IP=$(sed -e 's/^"//' -e 's/"$//' <<< $(echo $INSTANCE_DESCRIPTION | jq '.NetworkInterfaces[0].Association.PublicIp'))
-      echo "$SELENIUM_IP selenium" | sudo tee --append /etc/hosts
-    fi
-  fi
-done
-echo "ADD_SELENIUM_TO_HOSTS=true" | sudo tee --append /configurationProgress.sh
-
 # Find the existing hosted zone ID of the hosted zone name provided
 HOSTED_ZONES=$(aws route53 list-hosted-zones)
 HOSTED_ZONES_COUNT=$(aws route53 list-hosted-zones | jq '.HostedZones | length')
@@ -84,6 +67,23 @@ JENKINS_CHANGE_BATCH=$(jq -n --arg jenkinsRecordName "$JENKINS_RECORD_NAME" --ar
 }')
 aws route53 change-resource-record-sets --hosted-zone $HOSTED_ZONE_ID --change-batch "$JENKINS_CHANGE_BATCH"
 echo "CREATE_JENKINS_RECORD=true" | sudo tee --append /configurationProgress.sh
+
+# Find the public IP address of the Selenium grid and add it to the hosts file as "selenium"
+INSTANCES_DESCRIPTION=$(aws ec2 --region us-east-2 describe-instances)
+INSTANCE_COUNT=$(echo $INSTANCES_DESCRIPTION | jq '.Reservations | length')
+for (( INSTANCE_INDEX=0; INSTANCE_INDEX<INSTANCE_COUNT; INSTANCE_INDEX++ )) do
+  INSTANCE_DESCRIPTION=$(echo $INSTANCES_DESCRIPTION | jq '.Reservations['"$INSTANCE_INDEX"'].Instances[0]')
+  INSTANCE_STATE=$(echo $INSTANCE_DESCRIPTION | jq '.State.Name')
+  if [ $INSTANCE_STATE == '"running"' ]; then
+    INSTANCE_KEY=$(sed -e 's/^"//' -e 's/"$//' <<< $(echo $INSTANCE_DESCRIPTION | jq '.KeyName'))
+    SELENIUM_KEY=$PROJECT_NAME-selenium
+    if [ $INSTANCE_KEY == $SELENIUM_KEY ]; then
+      SELENIUM_IP=$(sed -e 's/^"//' -e 's/"$//' <<< $(echo $INSTANCE_DESCRIPTION | jq '.NetworkInterfaces[0].Association.PublicIp'))
+      echo "$SELENIUM_IP selenium" | sudo tee --append /etc/hosts
+    fi
+  fi
+done
+echo "ADD_SELENIUM_TO_HOSTS=true" | sudo tee --append /configurationProgress.sh
 
 # If a Selenium IP was found above, create/update a record in the hosted zone for selenium.<HOSTED_ZONE_NAME>
 if [ -z $SELENIUM_IP ]; then

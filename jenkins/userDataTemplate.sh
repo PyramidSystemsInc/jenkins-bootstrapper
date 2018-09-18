@@ -12,7 +12,7 @@ sudo chmod 755 saveVariablesCredentials.sh installPackages.sh configureJenkins.s
 # Run scripts to configure Jenkins
 ./saveVariablesCredentials.sh $PROJECT_NAME "$JOBS"
 ./installPackages.sh
-./configureJenkins.sh
+./configureJenkins.sh $PROJECT_NAME
 ./configureNetworking.sh $PROJECT_NAME $HOSTED_ZONE_NAME
 if [ "$CONFIGURE_SSL" == "true" ]; then
   ./configureSsl.sh $HOSTED_ZONE_NAME &

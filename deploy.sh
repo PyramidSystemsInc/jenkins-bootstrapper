@@ -13,6 +13,7 @@ COLOR_NONE='\033[0m'
 HOSTED_ZONE=false
 CONFIGURE_SSL=true
 DEPLOY_SELENIUM=true
+DEPLOY_SLAVES=true
 DEPLOY_SONARQUBE=true
 CONFIGURE_WEBHOOKS=true
 
@@ -29,9 +30,10 @@ while [ "$#" -gt 0 ]; do
     --iam-role) AWS_IAM_ROLE="$2"; shift 2;;
     -z) HOSTED_ZONE="$2"; shift 2;;
     --hosted-zone) HOSTED_ZONE="$2"; shift 2;;
-    --skip-ssl) CONFIGURE_SSL=false; shift 1;;
     --skip-selenium) DEPLOY_SELENIUM=false; shift 1;;
+    --skip-slaves) DEPLOY_SLAVES=false; shift 1;;
     --skip-sonarqube) DEPLOY_SONARQUBE=false; shift 1;;
+    --skip-ssl) CONFIGURE_SSL=false; shift 1;;
     --skip-webhooks) CONFIGURE_WEBHOOKS=false; shift 1;;
     -h) HELP_WANTED=true; shift 1;;
     --help) HELP_WANTED=true; shift 1;;
@@ -156,10 +158,6 @@ else
   fi
 fi
 
-# Create Jenkins EC2 Instance
-./jenkins/userDataGenerator.sh $PROJECT_NAME "$JOBS" $HOSTED_ZONE $CONFIGURE_SSL $CONFIGURE_WEBHOOKS
-./jenkins/createInstance.sh $PROJECT_NAME $AWS_IAM_ROLE
-
 # Create Selenium Grid ECS Cluster
 if [ "$DEPLOY_SELENIUM" == "true" ]; then
   cd selenium
@@ -167,6 +165,18 @@ if [ "$DEPLOY_SELENIUM" == "true" ]; then
   ./deploy.sh $PROJECT_NAME $AWS_ACCESS_KEY $AWS_SECRET_KEY >logs/clusterCreate.log 2>logs/taskCreate.log &
   cd ..
 fi
+
+# Create Jenkins Slaves ECS Cluster
+if [ "$DEPLOY_SLAVES" == "true" ]; then
+  cd slaves
+  rm -f logs/clusterCreate.log logs/taskCreate.log
+  ./deploy.sh $PROJECT_NAME $AWS_ACCESS_KEY $AWS_SECRET_KEY >logs/clusterCreate.log 2>logs/taskCreate.log &
+  cd ..
+fi
+
+# Create Jenkins EC2 Instance
+./jenkins/userDataGenerator.sh $PROJECT_NAME "$JOBS" $HOSTED_ZONE $CONFIGURE_SSL $CONFIGURE_WEBHOOKS
+./jenkins/createInstance.sh $PROJECT_NAME $AWS_IAM_ROLE
 
 # Create SonarQube ECS cluster
 # TODO
