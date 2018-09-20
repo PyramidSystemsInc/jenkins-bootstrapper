@@ -8,38 +8,15 @@ wget http://localhost:8080/jnlpJars/jenkins-cli.jar
 sudo sed -i 's#<installStateName>NEW.*#<installStateName>RUNNING<\/installStateName>#g' /var/lib/jenkins/config.xml
 echo "BYPASS_WIZARD=true" | sudo tee --append /configurationProgress.sh
 
+# Change JNLP slave port
+sudo sed -i 's#<slaveAgentPort>.*#<slaveAgentPort>37001<\/slaveAgentPort>#g' /var/lib/jenkins/config.xml
+
 # Install necessary Jenkins plugins (these plugins have dependencies which get downloaded and installed as well)
 JENKINS_PASSWORD=$(./printJenkinsPassword.sh)
 java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin git
 java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin github
-java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin amazon-ecs
+#java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$JENKINS_PASSWORD install-plugin amazon-ecs
 echo "INSTALL_PLUGINS=true" | sudo tee --append /configurationProgress.sh
-
-# Configure the Amazon ECS plugin
-ECS_CLUSTER_COUNT=$(aws ecs list-clusters --region us-east-2 | jq '.clusterArns | length')
-for (( ECS_CLUSTER_INDEX=0; ECS_CLUSTER_INDEX<ECS_CLUSTER_COUNT; ECS_CLUSTER_INDEX++ )) do
-  ECS_CLUSTER=$(aws ecs list-clusters --region us-east-2 | jq '.clusterArns['"$ECS_CLUSTER_INDEX"']')
-  if [[ $ECS_CLUSTER =~ $PROJECT_NAME-jenkins-slaves ]]; then
-    JENKINS_SLAVES_ECS_CLUSTER_ARN=$(sed -e 's/^"//g' -e 's/"$//g' <<< $ECS_CLUSTER)
-  fi
-done
-JENKINS_IP=$(curl ipinfo.io/ip)
-sudo ed -s /var/lib/jenkins/config.xml >> /dev/null <<EOF
-i
-  <clouds>
-    <com.cloudbees.jenkins.plugins.amazonecs.ECSCloud plugin="amazon-ecs@1.16">
-      <name>AWS</name>
-      <cluster>$JENKINS_SLAVES_ECS_CLUSTER_ARN</cluster>
-      <regionName>us-east-2</regionName>
-      <tunnel></tunnel>
-      <jenkinsUrl>http://$JENKINS_IP:8080/</jenkinsUrl>
-      <slaveTimoutInSeconds>900</slaveTimoutInSeconds>
-    </com.cloudbees.jenkins.plugins.amazonecs.ECSCloud>
-  </clouds>
-.
-w
-q
-EOF
 
 # Restart Jenkins to complete the installation of the plugins, then ensure Jenkins is up before continuing
 sudo service jenkins restart

@@ -171,7 +171,9 @@ if [ "$DEPLOY_SLAVES" == "true" ]; then
   cd slaves
   rm -f logs/clusterCreate.log logs/taskCreate.log
   ./deploy.sh $PROJECT_NAME $AWS_ACCESS_KEY $AWS_SECRET_KEY >logs/clusterCreate.log 2>logs/taskCreate.log &
-  cd ..
+  cd ecr
+  ./pushDockerImage.sh $PROJECT_NAME >/dev/null 2>/dev/null &
+  cd ../..
 fi
 
 # Create Jenkins EC2 Instance

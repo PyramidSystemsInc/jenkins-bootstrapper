@@ -30,6 +30,7 @@ SECURITY_GROUP_ID=$(sed -e 's/^"//' -e 's/"$//' <<< $(echo $(aws ec2 create-secu
 aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 443 --cidr 0.0.0.0/0
 aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 8080 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-id $SECURITY_GROUP_ID --protocol tcp --port 37001 --cidr 0.0.0.0/0
 
 # Create Jenkins key pair
 sudo rm ~/Desktop/$JENKINS_ID.pem
