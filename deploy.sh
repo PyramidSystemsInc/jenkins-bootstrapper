@@ -16,6 +16,8 @@ DEPLOY_SELENIUM=true
 DEPLOY_SLAVES=true
 DEPLOY_SONARQUBE=true
 CONFIGURE_WEBHOOKS=true
+SLAVE_MAX=10
+SLAVE_MIN=2
 
 # Handle input
 while [ "$#" -gt 0 ]; do
@@ -30,6 +32,8 @@ while [ "$#" -gt 0 ]; do
     --iam-role) AWS_IAM_ROLE="$2"; shift 2;;
     -z) HOSTED_ZONE="$2"; shift 2;;
     --hosted-zone) HOSTED_ZONE="$2"; shift 2;;
+    --slave-max) SLAVE_MAX="$2"; shift 2;;
+    --slave-min) SLAVE_MIN="$2"; shift 2;;
     --skip-selenium) DEPLOY_SELENIUM=false; shift 1;;
     --skip-slaves) DEPLOY_SLAVES=false; shift 1;;
     --skip-sonarqube) DEPLOY_SONARQUBE=false; shift 1;;
@@ -178,7 +182,7 @@ fi
 
 # Create Jenkins EC2 Instance
 ./jenkins/userDataGenerator.sh $PROJECT_NAME "$JOBS" $HOSTED_ZONE $CONFIGURE_SSL $CONFIGURE_WEBHOOKS
-./jenkins/createInstance.sh $PROJECT_NAME $AWS_IAM_ROLE
+./jenkins/createInstance.sh $PROJECT_NAME $AWS_IAM_ROLE $SLAVE_MIN
 
 # Create SonarQube ECS cluster
 # TODO

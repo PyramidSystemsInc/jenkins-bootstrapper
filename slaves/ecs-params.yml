@@ -2,12 +2,6 @@ version: 1
 task_definition:
   ecs_network_mode: bridge
   services:
-    selenium-hub:
-      cpu_shares: 682
-      mem_limit: 1376666667
-    selenium-chrome:
-      cpu_shares: 683
-      mem_limit: 1376666666
-    selenium-firefox:
-      cpu_shares: 683
-      mem_limit: 1376666666
+    slave:
+      cpu_shares: 2048
+      mem_limit: 4130000001

@@ -20,6 +20,25 @@ else
   JOBS=$2
 fi
 
+# Create CRON jobs to initiate the provisioning of Jenkins slaves
+echo -e "$(sudo crontab -l)\n* * * * * /home/ec2-user/provisionSlaves.sh" | sudo crontab -
+echo -e "$(sudo crontab -l)\n* * * * * ( sleep 20; /home/ec2-user/provisionSlaves.sh )" | sudo crontab -
+echo -e "$(sudo crontab -l)\n* * * * * ( sleep 40; /home/ec2-user/provisionSlaves.sh )" | sudo crontab -
+
+# Create script to provision Jenkins slaves
+sudo touch /home/ec2-user/provisionSlaves.sh
+sudo chmod 755 /home/ec2-user/provisionSlaves.sh
+sudo ed -s /home/ec2-user/provisionSlaves.sh >> /dev/null <<EOF
+i
+#! /bin/bash
+
+JENKINS_PASSWORD=\$(/home/ec2-user/printJenkinsPassword.sh)
+JENKINS_CRUMB=\$(curl -s 'http://admin:'\$JENKINS_PASSWORD'@localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')
+curl -H \$JENKINS_CRUMB -L -s -u admin:\$JENKINS_PASSWORD http://localhost:8080/queue/api/json | jq '.items | length'
+.
+w
+EOF
+
 # Create file to monitor instance configuring process
 sudo touch /configurationProgress.sh
 sudo chmod 755 /configurationProgress.sh

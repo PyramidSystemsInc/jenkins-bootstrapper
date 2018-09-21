@@ -1,9 +1,23 @@
 version: "3"
 services:
-  slave:
-    image: jenkins/jnlp-slave
-    ports:
-      - "80:80"
+  slave1:
+    image: 118104210923.dkr.ecr.us-east-2.amazonaws.com/jenkins-slave:rispd
+    environment:
+      JENKINS_IP: 18.223.109.200
+      SECRET_KEY: 625a59f912391dd0cf55caa99a3fcd57a991f2693fbad7b75f67098eb8a87f53
+      SLAVE_NUMBER: 1
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: slave
+        awslogs-region: us-east-2
+        awslogs-stream-prefix: slave_
+  slave2:
+    image: 118104210923.dkr.ecr.us-east-2.amazonaws.com/jenkins-slave:rispd
+    environment:
+      JENKINS_IP: 18.223.109.200
+      SECRET_KEY: 2eaa79c3717ba43335c97ab160d0907fd6234626369e6e2cd15ea940cfc390dc
+      SLAVE_NUMBER: 2
     logging:
       driver: awslogs
       options:
