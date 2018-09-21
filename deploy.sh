@@ -174,14 +174,14 @@ fi
 if [ "$DEPLOY_SLAVES" == "true" ]; then
   cd slaves
   rm -f logs/clusterCreate.log logs/taskCreate.log
-  ./deploy.sh $PROJECT_NAME $AWS_ACCESS_KEY $AWS_SECRET_KEY >logs/clusterCreate.log 2>logs/taskCreate.log &
+  ./deploy.sh $PROJECT_NAME $AWS_ACCESS_KEY $AWS_SECRET_KEY $SLAVE_MIN >logs/clusterCreate.log 2>logs/taskCreate.log &
   cd ecr
   ./pushDockerImage.sh $PROJECT_NAME >/dev/null 2>/dev/null &
   cd ../..
 fi
 
 # Create Jenkins EC2 Instance
-./jenkins/userDataGenerator.sh $PROJECT_NAME "$JOBS" $HOSTED_ZONE $CONFIGURE_SSL $CONFIGURE_WEBHOOKS
+./jenkins/userDataGenerator.sh $PROJECT_NAME "$JOBS" $HOSTED_ZONE $CONFIGURE_SSL $CONFIGURE_WEBHOOKS $DEPLOY_SLAVES $SLAVE_MIN
 ./jenkins/createInstance.sh $PROJECT_NAME $AWS_IAM_ROLE $SLAVE_MIN
 
 # Create SonarQube ECS cluster
