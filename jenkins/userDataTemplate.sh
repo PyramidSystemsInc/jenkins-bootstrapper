@@ -26,7 +26,7 @@ else
   echo "GITHUB_WEBHOOKS_CONFIGURED=false" | sudo tee --append /configurationProgress.sh
 fi
 if [ "$CONFIGURE_SLAVES" == "true" ]; then
-  ./configureSlaves.sh $SLAVE_MIN
+  ./configureSlaves.sh $PROJECT_NAME $SLAVE_MIN
 else
   echo "SLAVES_CONFIGURED=false" | sudo tee --append /configurationProgress.sh
 fi
@@ -36,4 +36,4 @@ sudo service jenkins restart
 sudo service nginx restart
 
 # Delete files
-rm saveVariablesCredentials.sh installPackages.sh configureJenkins.sh configureNetworking.sh configureSsl.sh configureGitHubWebhooks.sh
+rm saveVariablesCredentials.sh installPackages.sh configureJenkins.sh configureNetworking.sh configureSlaves.sh configureSsl.sh configureGitHubWebhooks.sh

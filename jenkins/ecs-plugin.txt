@@ -199,3 +199,15 @@ EOF
 JENKINS_PASSWORD=$(/home/ec2-user/printJenkinsPassword.sh)
 JENKINS_CRUMB=$(curl -s 'http://admin:'$JENKINS_PASSWORD'@localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')
 curl -H $JENKINS_CRUMB -L -s -u admin:$JENKINS_PASSWORD http://localhost:8080/queue/api/json | jq '.items | length'
+
+
+
+
+
+
+
+
+
+// 2018.09.24 - Giving up on ECS-CLI
+aws ecs list-container-instances --cluster rispd-jenkins-slaves --region us-east-2
+aws ecs describe-container-instances --cluster rispd-jenkins-slaves --region us-east-2 --container-instances 9a4026a1-700e-4d09-9eb5-ab21db035c34

@@ -17,7 +17,7 @@ DEPLOY_SLAVES=true
 DEPLOY_SONARQUBE=true
 CONFIGURE_WEBHOOKS=true
 SLAVE_MAX=10
-SLAVE_MIN=2
+SLAVE_MIN=3
 
 # Handle input
 while [ "$#" -gt 0 ]; do
