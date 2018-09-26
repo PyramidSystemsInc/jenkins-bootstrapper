@@ -1,17 +1,19 @@
 # Download scripts to configure Jenkins
 cd /home/ec2-user
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/saveVariablesCredentials.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/installPackages.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureJenkins.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureNetworking.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureSsl.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureGitHubWebhooks.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/configureSlaves.sh
-wget https://s3.us-east-2.amazonaws.com/jenkins-bootstrapper/printJenkinsPassword.sh
-sudo chmod 755 saveVariablesCredentials.sh installPackages.sh configureJenkins.sh configureNetworking.sh configureSlaves.sh configureSsl.sh configureGitHubWebhooks.sh printJenkinsPassword.sh
+
+# Wait for configuration scripts to be secure copied over
+while : ; do
+  if [ ! -f /home/ec2-user/copyFiles.sh ]; then
+    sleep 2
+  else
+    break
+  fi
+done
+
+sudo chmod 755 copyFiles.sh installPackages.sh configureJenkins.sh configureNetworking.sh configureSlaves.sh configureSsl.sh configureGitHubWebhooks.sh printJenkinsPassword.sh
 
 # Run scripts to configure Jenkins
-./saveVariablesCredentials.sh $PROJECT_NAME "$JOBS"
+./copyFiles.sh $PROJECT_NAME "$JOBS"
 ./installPackages.sh
 ./configureJenkins.sh $PROJECT_NAME
 ./configureNetworking.sh $PROJECT_NAME $HOSTED_ZONE_NAME
@@ -36,4 +38,4 @@ sudo service jenkins restart
 sudo service nginx restart
 
 # Delete files
-rm saveVariablesCredentials.sh installPackages.sh configureJenkins.sh configureNetworking.sh configureSlaves.sh configureSsl.sh configureGitHubWebhooks.sh
+rm copyFiles.sh installPackages.sh configureJenkins.sh configureNetworking.sh configureSlaves.sh configureSsl.sh configureGitHubWebhooks.sh

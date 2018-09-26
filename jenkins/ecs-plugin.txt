@@ -211,3 +211,29 @@ curl -H $JENKINS_CRUMB -L -s -u admin:$JENKINS_PASSWORD http://localhost:8080/qu
 // 2018.09.24 - Giving up on ECS-CLI
 aws ecs list-container-instances --cluster rispd-jenkins-slaves --region us-east-2
 aws ecs describe-container-instances --cluster rispd-jenkins-slaves --region us-east-2 --container-instances 9a4026a1-700e-4d09-9eb5-ab21db035c34
+
+
+
+
+// 2018.09.26 - Organizing and linting scripts
+PROJECT_NAME='rispd'
+INSTANCE_STATUSES=$(echo $(aws ec2 describe-instances --query 'Reservations[*].Instances[*].[State.Name,Tags[?Key==`Name`].Value,PublicIpAddress]') | jq '.')
+STATUS_COUNT=$(echo $INSTANCE_STATUSES | jq '. | length')
+for (( STATUS_INDEX=0; STATUS_INDEX<STATUS_COUNT; STATUS_INDEX++ )) do
+  INSTANCE_STATUS=$(echo $INSTANCE_STATUSES | jq '.['"$STATUS_INDEX"']')
+  INSTANCE_RUN_STATE=$(echo $INSTANCE_STATUS | jq '.[0][0]')
+  INSTANCE_NAME=$(sed -e 's/^"//g' -e 's/"$//g' <<< $(echo $INSTANCE_STATUS | jq '.[0][1][0]'))
+  if [[ $INSTANCE_RUN_STATE == \"running\" ]] && [[ $INSTANCE_NAME == $PROJECT_NAME-jenkins ]]; then
+    INSTANCE_PUBLIC_IP=$(sed -e 's/^"//g' -e 's/"$//g' <<< $(echo $INSTANCE_STATUS | jq '.[0][2]'))
+    echo $INSTANCE_PUBLIC_IP
+  fi
+done
+
+
+function copyFile() {
+  FILE_TO_COPY=("$(cat "$1")")
+	cat <<- EOF > "$2"
+  $FILE_TO_COPY
+	EOF
+}
+

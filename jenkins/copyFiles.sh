@@ -3,7 +3,7 @@
 # Ensure a project name is provided
 if [ -z "$1" ]; then
   echo -e "${COLOR_RED}ERROR: Project name must be provided. Please re-run as follows:${COLOR_NONE}"
-  echo -e "${COLOR_WHITE}    ./saveVariablesCredentials.sh <PROJECT_NAME> <JOBS_JSON>"
+  echo -e "${COLOR_WHITE}    ./copyFiles.sh <PROJECT_NAME> <JOBS_JSON>"
   echo -e "${COLOR_NONE}"
   exit 2
 else
@@ -13,7 +13,7 @@ fi
 # Ensure a jobs config is provided
 if [ -z "$2" ]; then
   echo -e "${COLOR_RED}ERROR: Jobs JSON configuration object must be provided. Please re-run as follows:${COLOR_NONE}"
-  echo -e "${COLOR_WHITE}    ./saveVariablesCredentials.sh <PROJECT_NAME> <JOBS_JSON>"
+  echo -e "${COLOR_WHITE}    ./copyFiles.sh <PROJECT_NAME> <JOBS_JSON>"
   echo -e "${COLOR_NONE}"
   exit 2
 else
@@ -37,8 +37,8 @@ i
 # TODO: Lop off the top of .build-queue-size if it is more than 360 lines (two hours worth of records)
 
 JENKINS_PASSWORD=\$(/home/ec2-user/printJenkinsPassword.sh)
-JENKINS_CRUMB=\$(curl -s 'http://admin:'\$JENKINS_PASSWORD'@localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)')
-echo \$(curl -H \$JENKINS_CRUMB -L -s -u admin:\$JENKINS_PASSWORD http://localhost:8080/queue/api/json | jq '.items | length') >> /home/ec2-user/slaves/.build-queue-size
+JENKINS_CRUMB=\$(curl -s "http://admin:"\$JENKINS_PASSWORD"@localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb)")
+echo \$(curl -H \$JENKINS_CRUMB -L -s -u admin:\$JENKINS_PASSWORD http://localhost:8080/queue/api/json | jq ".items | length") >> /home/ec2-user/slaves/.build-queue-size
 
 BUILD_QUEUE_MEASURE_ONE=\$(tail -n 3 /home/ec2-user/slaves/.build-queue-size | head -n 1)
 BUILD_QUEUE_MEASURE_TWO=\$(tail -n 2 /home/ec2-user/slaves/.build-queue-size | head -n 1)

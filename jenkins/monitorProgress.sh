@@ -10,7 +10,7 @@ COLOR_NONE='\033[0m'
 # Define special characters
 CHECK_MARK='\xE2\x9C\x94'
 
-# Show output for saveVariablesCredentials.sh script
+# Show output for copyFiles.sh script
 echo -e ""
 ELLIPSIS=""
 LINE_COUNT=4
