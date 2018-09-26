@@ -8,9 +8,9 @@ COLOR_NONE='\033[0m'
 # Ensure a project name is provided
 if [ -z "$1" ]; then
   echo -e "${COLOR_RED}ERROR: Project name must be provided. Please re-run as follows:${COLOR_NONE}"
-  echo -e "${COLOR_WHITE}    ./deploy.sh <PROJECT_NAME>"
+  echo -e "${COLOR_WHITE}    ./teardown.sh <PROJECT_NAME>"
   echo -e "    -OR-"
-  echo -e "    ./deploy.sh <PROJECT_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>"
+  echo -e "    ./teardown.sh <PROJECT_NAME> <AWS_ACCESS_KEY> <AWS_SECRET_KEY>"
   echo -e "${COLOR_NONE}"
   exit 2
 else
