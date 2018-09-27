@@ -16,6 +16,8 @@ function copyFilesToInstance() {
 	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/configureGitHubWebhooks.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
 	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/configureSlaves.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
 	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/printJenkinsPassword.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
+	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/provisionSlaves.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
+	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/createNewSlave.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
 }
 
 # Define all colors used for output

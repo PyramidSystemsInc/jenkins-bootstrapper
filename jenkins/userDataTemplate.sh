@@ -45,9 +45,10 @@ function runConfigurationScripts() {
 }
 
 # Wait for configuration scripts to be secure copied over
+# Note: createNewSlave.sh is the last script to the scp'd over
 function waitForCompletionOfScp() {
 	while : ; do
-		if [ ! -f /home/ec2-user/copyFiles.sh ]; then
+		if [ ! -f /home/ec2-user/createNewSlave.sh ]; then
 			sleep 2
 		else
 			break
