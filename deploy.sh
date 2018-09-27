@@ -272,6 +272,7 @@ handleInput "$@"
 showHelp
 ensureRequiredInputsProvided
 loadOrOverwriteAwsCredentials
+# deployFortifyCluster
 deploySeleniumCluster
 deploySlavesCluster
 # deploySonarQubeCluster

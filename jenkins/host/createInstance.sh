@@ -28,9 +28,15 @@ function createKeyPair() {
 # Create Jenkins security group
 function createSecurityGroup() {
 	SECURITY_GROUP_ID=$(sed -e 's/^"//' -e 's/"$//' <<< "$(aws ec2 create-security-group --group-name "$JENKINS_ID" --description "Created by jenkins-bootstrapper" | jq '.GroupId')")
+	# Open port for SSH
 	aws ec2 authorize-security-group-ingress --group-id "$SECURITY_GROUP_ID" --protocol tcp --port 22 --cidr 0.0.0.0/0
+	# Open port for HTTP
+	aws ec2 authorize-security-group-ingress --group-id "$SECURITY_GROUP_ID" --protocol tcp --port 80 --cidr 0.0.0.0/0
+	# Open port for HTTPS
 	aws ec2 authorize-security-group-ingress --group-id "$SECURITY_GROUP_ID" --protocol tcp --port 443 --cidr 0.0.0.0/0
+	# Open port for Jenkins (re-routed to 80)
 	aws ec2 authorize-security-group-ingress --group-id "$SECURITY_GROUP_ID" --protocol tcp --port 8080 --cidr 0.0.0.0/0
+	# Open port for JNLP (Jenkins slaves)
 	aws ec2 authorize-security-group-ingress --group-id "$SECURITY_GROUP_ID" --protocol tcp --port 37001 --cidr 0.0.0.0/0
 }
 

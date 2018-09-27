@@ -71,7 +71,6 @@ task_definition:
 w
 EOF
 pushd /home/ec2-user/slaves/slave$SLAVE_INDEX
-env HOME=$(pwd)
 sudo /usr/local/bin/ecs-cli compose up --region us-east-2 --cluster rispd-jenkins-slaves 2>deploy.log
 popd
 done
