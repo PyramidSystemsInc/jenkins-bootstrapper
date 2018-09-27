@@ -2,22 +2,13 @@
 
 # Change Amazon's default "message of the day" that greets you when you first login
 function changeMessageOfTheDay() {
-	ssh -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem ec2-user@"$JENKINS_IP" 'echo "" | sudo -Sv && bash -s' < jenkins/changeMotd.sh >> /dev/null
+	ssh -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem ec2-user@"$JENKINS_IP" 'echo "" | sudo -Sv && bash -s' < jenkins/ssh/changeMotd.sh >> /dev/null
 	sleep 2
 }
 
 # Copy all configuration scripts to the EC2 instance
 function copyFilesToInstance() {
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/copyFiles.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/installPackages.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/configureJenkins.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/configureNetworking.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/configureSsl.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/configureGitHubWebhooks.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/configureSlaves.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/printJenkinsPassword.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/provisionSlaves.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
-	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/createNewSlave.sh ec2-user@"$JENKINS_IP":/home/ec2-user/
+	scp -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem jenkins/scp/* ec2-user@"$JENKINS_IP":/home/ec2-user/
 }
 
 # Define all colors used for output
@@ -31,8 +22,8 @@ function defineColorPalette() {
 
 # Deploy Jenkins EC2 Instance
 function deployJenkinsInstance() {
-	./jenkins/userDataGenerator.sh "$PROJECT_NAME" "$JOBS" "$HOSTED_ZONE" "$CONFIGURE_SSL" "$CONFIGURE_WEBHOOKS" "$DEPLOY_SLAVES" "$SLAVE_MIN"
-	./jenkins/createInstance.sh "$PROJECT_NAME" "$AWS_IAM_ROLE" "$SLAVE_MIN"
+	./jenkins/host/userDataGenerator.sh "$PROJECT_NAME" "$JOBS" "$HOSTED_ZONE" "$CONFIGURE_SSL" "$CONFIGURE_WEBHOOKS" "$DEPLOY_SLAVES" "$SLAVE_MIN"
+	./jenkins/host/createInstance.sh "$PROJECT_NAME" "$AWS_IAM_ROLE" "$SLAVE_MIN"
 }
 
 # Create Selenium Grid ECS Cluster
@@ -191,7 +182,7 @@ function loginToJenkinsInstance() {
 
 # Monitor the Jenkins configuration process by running a script over SSH
 function monitorJenkinsConfiguration() {
-	ssh -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem ec2-user@"$JENKINS_IP" 'echo "" | sudo -Sv && bash -s' < jenkins/monitorProgress.sh
+	ssh -i ~/Desktop/"$PROJECT_NAME"-jenkins.pem ec2-user@"$JENKINS_IP" 'echo "" | sudo -Sv && bash -s' < jenkins/ssh/monitorProgress.sh
 }
 
 # Set the default values for deployments in case overrides are not provided

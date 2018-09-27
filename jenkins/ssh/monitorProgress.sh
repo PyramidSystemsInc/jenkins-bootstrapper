@@ -14,6 +14,12 @@ function defineSpecialCharacters() {
 	CHECK_MARK='\xE2\x9C\x94'
 }
 
+# Create a configuration progress file in case it does not already exist
+function ensureConfigurationProgressFile() {
+  sudo touch /configurationProgress.sh
+  sudo chmod 755 /configurationProgress.sh
+}
+
 # Show output for copyFiles.sh script
 function monitorCopyFilesProgress() {
 	echo -e ""
@@ -230,6 +236,7 @@ function monitorInstallPackagesProgress() {
 
 defineColorPalette
 defineSpecialCharacters
+ensureConfigurationProgressFile
 monitorCopyFilesProgress
 monitorInstallPackagesProgress
 monitorConfigureJenkinsProgress

@@ -20,22 +20,22 @@ else
   JOBS=$2
 fi
 
-# Create CRON jobs to initiate the provisioning of Jenkins slaves
-echo -e "$(sudo crontab -l)\n* * * * * /home/ec2-user/provisionSlaves.sh" | sudo crontab -
-echo -e "$(sudo crontab -l)\n* * * * * ( sleep 20; /home/ec2-user/provisionSlaves.sh )" | sudo crontab -
-echo -e "$(sudo crontab -l)\n* * * * * ( sleep 40; /home/ec2-user/provisionSlaves.sh )" | sudo crontab -
-
-# Create log for Jenkins build queue size
-sudo mkdir /home/ec2-user/slaves
-sudo mv /home/ec2-user/createNewSlave.sh /home/ec2-user/slaves/ >output.txt 2>error.txt
-sudo touch /home/ec2-user/slaves/.build-queue-size
-
 # Create file to monitor instance configuring process
 sudo touch /configurationProgress.sh
 sudo chmod 755 /configurationProgress.sh
 echo "#! /bin/bash" | sudo tee --append /configurationProgress.sh
 echo "" | sudo tee --append /configurationProgress.sh
 echo "CONFIG_PROGRESS_CREATED=true" | sudo tee --append /configurationProgress.sh
+
+# Create CRON jobs to initiate the provisioning of Jenkins slaves
+echo -e "$(sudo crontab -l)\n* * * * * /home/ec2-user/provisionSlaves.sh" | sudo crontab -
+echo -e "$(sudo crontab -l)\n* * * * * ( sleep 20; /home/ec2-user/provisionSlaves.sh )" | sudo crontab -
+echo -e "$(sudo crontab -l)\n* * * * * ( sleep 40; /home/ec2-user/provisionSlaves.sh )" | sudo crontab -
+
+# Create log for Jenkins build queue size
+sudo mkdir /home/ec2-user/slaves >> /dev/null
+sudo mv /home/ec2-user/createNewSlave.sh /home/ec2-user/slaves/ >> /dev/null
+sudo touch /home/ec2-user/slaves/.build-queue-size
 
 # Create jobs.json file
 sudo touch /home/ec2-user/jobs.json

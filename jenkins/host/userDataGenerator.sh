@@ -27,7 +27,7 @@ function declareVariables() {
 	CONFIGURE_WEBHOOKS=$5
 	CONFIGURE_SLAVES=$6
 	SLAVE_MIN=$7
-	USER_DATA_SCRIPT=$(cat ./jenkins/userDataTemplate.sh)
+	USER_DATA_SCRIPT=$(cat ./jenkins/host/userDataTemplate.sh)
 }
 
 function deleteUserDataScript() {
