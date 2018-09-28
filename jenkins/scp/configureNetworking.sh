@@ -147,7 +147,7 @@ function overwriteNginxConfig() {
   sudo rm /etc/nginx/nginx.conf
   sudo mkdir -p /etc/nginx/
   sudo touch /etc/nginx/nginx.conf
-  cat <<- EOF > /etc/nginx/nginx.conf
+	cat <<- EOF > /etc/nginx/nginx.conf
 		user nginx;
 		worker_processes auto;
 		error_log /var/log/nginx/error.log;
@@ -176,8 +176,6 @@ function overwriteNginxConfig() {
 		      proxy_pass http://localhost:8080/;
 		      proxy_set_header Host \$host;
 		      proxy_set_header X-Real-IP \$remote_addr;
-		      proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-		      proxy_set_header X-Forwarded-Proto "https";
 		    }
 		  }
 		}

@@ -8,21 +8,21 @@ function cleanup() {
 # Create payload body to be sent to api.github.com
 # Note: It should be the same for all GitHub repositories because it just points to Jenkins
 function createGitHubPayload() {
-	touch /home/ec2-user/webhook.json
+  touch /home/ec2-user/webhook.json
 	cat <<- EOF > /home/ec2-user/webhook.json
-	{
-		"name": "web",
-		"active": true,
-		"events": [
-			"push"
-		],
-		"config": {
-			"url": "https://$DOMAIN/github-webhook/",
-			"content_type": "json"
+		{
+		  "name": "web",
+		  "active": true,
+		  "events": [
+		    "push"
+		  ],
+		  "config": {
+		    "url": "https://$DOMAIN/github-webhook/",
+		    "content_type": "json"
+		  }
 		}
-	}
 	EOF
-	echo "CREATE_PAYLOAD=true" | sudo tee --append /configurationProgress.sh
+  echo "CREATE_PAYLOAD=true" | sudo tee --append /configurationProgress.sh
 }
 
 # Create a webhook for each unique URL in the jobs.json file
