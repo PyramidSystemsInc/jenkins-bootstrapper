@@ -15,39 +15,6 @@ function configureEcsCli() {
   sudo /usr/local/bin/ecs-cli configure --cluster $PROJECT_NAME-jenkins-slaves --region us-east-2 --default-launch-type EC2 --config-name $PROJECT_NAME-jenkins-slaves
 }
 
-# Create Jenkins slave configuration payload
-function createJenkinsSlaveConfigPayload() {
-  mkdir /home/ec2-user/slaves/slave$SLAVE_INDEX
-  touch /home/ec2-user/slaves/slave$SLAVE_INDEX/slave-config.xml
-	cat <<- EOF > /home/ec2-user/slaves/slave$SLAVE_INDEX/slave-config.xml
-		<?xml version="1.1" encoding="UTF-8"?>
-		<slave>
-		  <name>slave$SLAVE_INDEX</name>
-		  <description></description>
-		  <remoteFS>/home/ec2-user</remoteFS>
-		  <numExecutors>1</numExecutors>
-		  <mode>NORMAL</mode>
-		  <retentionStrategy class="hudson.slaves.RetentionStrategy\$Always"/>
-		  <launcher class="hudson.slaves.JNLPLauncher">
-		    <workDirSettings>
-		      <disabled>false</disabled>
-		      <internalDir>remoting</internalDir>
-		      <failIfWorkDirIsMissing>false</failIfWorkDirIsMissing>
-		    </workDirSettings>
-		  </launcher>
-		  <label></label>
-		  <nodeProperties/>
-		</slave>
-	EOF
-}
-
-# Create a new node/slave in Jenkins
-function createSlaveInJenkins() {
-  java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$(/home/ec2-user/printJenkinsPassword.sh) create-node < /home/ec2-user/slaves/slave$SLAVE_INDEX/slave-config.xml
-  sleep 10
-  SLAVE_SECRET_KEY=$(curl -H "$(curl -s 'http://'$JENKINS_USER':'$JENKINS_PASSWORD'@http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb')" -L -s -u $JENKINS_USER:$JENKINS_PASSWORD http://localhost:8080/computer/slave$SLAVE_INDEX/slave-agent.jnlp | grep -Po '[A-Fa-f0-9]{64}')
-}
-
 # Create a Docker Compose file specific to a slave for use with the ECS CLI
 function createDockerComposeFile() {
   touch /home/ec2-user/slaves/slave$SLAVE_INDEX/docker-compose.yml
@@ -81,6 +48,39 @@ function createEcsParamsFile() {
 		      cpu_shares: 1024
 		      mem_limit: 2065000000
 	EOF
+}
+
+# Create Jenkins slave configuration payload
+function createJenkinsSlaveConfigPayload() {
+  mkdir /home/ec2-user/slaves/slave$SLAVE_INDEX
+  touch /home/ec2-user/slaves/slave$SLAVE_INDEX/slave-config.xml
+	cat <<- EOF > /home/ec2-user/slaves/slave$SLAVE_INDEX/slave-config.xml
+		<?xml version="1.1" encoding="UTF-8"?>
+		<slave>
+		  <name>slave$SLAVE_INDEX</name>
+		  <description></description>
+		  <remoteFS>/home/ec2-user</remoteFS>
+		  <numExecutors>1</numExecutors>
+		  <mode>NORMAL</mode>
+		  <retentionStrategy class="hudson.slaves.RetentionStrategy\$Always"/>
+		  <launcher class="hudson.slaves.JNLPLauncher">
+		    <workDirSettings>
+		      <disabled>false</disabled>
+		      <internalDir>remoting</internalDir>
+		      <failIfWorkDirIsMissing>false</failIfWorkDirIsMissing>
+		    </workDirSettings>
+		  </launcher>
+		  <label></label>
+		  <nodeProperties/>
+		</slave>
+	EOF
+}
+
+# Create a new node/slave in Jenkins
+function createSlaveInJenkins() {
+  java -jar jenkins-cli.jar -s http://localhost:8080 -auth admin:$(/home/ec2-user/printJenkinsPassword.sh) create-node < /home/ec2-user/slaves/slave$SLAVE_INDEX/slave-config.xml
+  sleep 10
+  SLAVE_SECRET_KEY=$(curl -H "$(curl -s 'http://'$JENKINS_USER':'$JENKINS_PASSWORD'@http://localhost:8080/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,":",//crumb')" -L -s -u $JENKINS_USER:$JENKINS_PASSWORD http://localhost:8080/computer/slave$SLAVE_INDEX/slave-agent.jnlp | grep -Po '[A-Fa-f0-9]{64}')
 }
 
 # Launch a new instance in AWS using the Docker Compose file and ECS CLI
