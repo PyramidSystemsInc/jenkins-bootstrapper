@@ -10,11 +10,6 @@ function defineVariables() {
   SLAVE_MAX_INDEX=$SLAVE_MIN+1
 }
 
-# Configure ECS CLI
-function configureEcsCli() {
-  sudo /usr/local/bin/ecs-cli configure --cluster $PROJECT_NAME-jenkins-slaves --region us-east-2 --default-launch-type EC2 --config-name $PROJECT_NAME-jenkins-slaves
-}
-
 # Create a Docker Compose file specific to a slave for use with the ECS CLI
 function createDockerComposeFile() {
   touch /home/ec2-user/slaves/slave$SLAVE_INDEX/docker-compose.yml
@@ -85,8 +80,8 @@ function createSlaveInJenkins() {
 
 # Launch a new instance in AWS using the Docker Compose file and ECS CLI
 function launchSlaveInEcs() {
-  pushd /home/ec2-user/slaves/slave$SLAVE_INDEX
-  sudo /usr/local/bin/ecs-cli compose up --region us-east-2 --cluster rispd-jenkins-slaves 2>deploy.log
+  pushd /home/ec2-user/aws-scripts
+  ./launchEcsTask.sh --cluster $PROJECT_NAME-jenkins-slaves --task slave$SLAVE_INDEX --container "docker run --name slave$SLAVE_INDEX -e JENKINS_IP=$JENKINS_IP -e SECRET_KEY=$SLAVE_SECRET_KEY -e SLAVE_NUMBER=$SLAVE_INDEX --cpu 1 --memory 2 ecr/jenkins-slave:$PROJECT_NAME"
   popd
 }
 
@@ -95,8 +90,6 @@ function createSlaves() {
   for (( SLAVE_INDEX=1; SLAVE_INDEX<SLAVE_MAX_INDEX; SLAVE_INDEX++ )) do
     createJenkinsSlaveConfigPayload
     createSlaveInJenkins
-    createDockerComposeFile
-    createEcsParamsFile
     launchSlaveInEcs
   done
 }
@@ -107,6 +100,5 @@ function changeOwnershipOfFiles() {
 }
 
 defineVariables "$@"
-configureEcsCli
 createSlaves
 changeOwnershipOfFiles

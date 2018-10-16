@@ -73,8 +73,8 @@ function createSlaveInJenkins() {
 
 # Launch a new instance in AWS using the Docker Compose file and ECS CLI
 function launchSlaveInEcs() {
-  pushd /home/ec2-user/slaves/slave$SLAVE_INDEX
-  sudo /usr/local/bin/ecs-cli compose up --region us-east-2 --cluster rispd-jenkins-slaves 2>deploy.log
+  pushd /home/ec2-user/aws-scripts
+  ./launchEcsTask.sh --cluster $PROJECT_NAME-jenkins-slaves --task slave$SLAVE_INDEX --container "docker run --name slave$SLAVE_INDEX -e JENKINS_IP=$JENKINS_IP -e SECRET_KEY=$SLAVE_SECRET_KEY -e SLAVE_NUMBER=$SLAVE_INDEX --cpu 1 --memory 2 ecr/jenkins-slave:$PROJECT_NAME"
   popd
 }
 
@@ -129,8 +129,8 @@ done
 rm -Rf /home/ec2-user/slaves/slave$SLAVE_INDEX || true
 createJenkinsSlaveConfigPayload
 createSlaveInJenkins
-createDockerComposeFile
-createEcsParamsFile
+# createDockerComposeFile
+# createEcsParamsFile
 
 # Wait until the registered container instances count of the cluster reaches the desired slave count
 while : ; do

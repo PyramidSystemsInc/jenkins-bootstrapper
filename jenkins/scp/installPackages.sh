@@ -28,6 +28,12 @@ function installGit() {
   echo "INSTALL_GIT=true" | sudo tee --append /configurationProgress.sh
 }
 
+# Clone Pyramid's AWS Scripts
+function cloneAwsScriptsRepo() {
+  cd /home/ec2-user
+  GIT_TERMINAL_PROMPT=0 git clone https://github.com/PyramidSystemsInc/aws-scripts.git
+}
+
 # Install Java 8
 function installJava() {
   sudo yum remove java-1.7.0-openjdk -y
@@ -92,6 +98,7 @@ installJava
 installJenkins
 installDocker
 installGit
+cloneAwsScriptsRepo
 installCpp
 installNodeJs
 installNginx
