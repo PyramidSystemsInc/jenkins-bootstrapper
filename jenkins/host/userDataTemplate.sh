@@ -25,7 +25,7 @@ function restartServices() {
 function runConfigurationScripts() {
   ./copyFiles.sh "$PROJECT_NAME" "$JOBS"
   ./installPackages.sh
-  ./configureJenkins.sh "$PROJECT_NAME"
+  ./configureJenkins.sh "$PROJECT_NAME" "$CONFIGURE_SLAVES"
   ./configureNetworking.sh "$PROJECT_NAME" "$HOSTED_ZONE_NAME"
   if [ "$CONFIGURE_SSL" == "true" ]; then
     ./configureSsl.sh "$HOSTED_ZONE_NAME" &

@@ -3,41 +3,6 @@
 JENKINS_USER='admin'
 JENKINS_IP=$(curl ipinfo.io/ip)
 
-# Create a Docker Compose file specific to a slave for use with the ECS CLI
-function createDockerComposeFile() {
-  touch /home/ec2-user/slaves/slave$SLAVE_INDEX/docker-compose.yml
-	cat <<- EOF > /home/ec2-user/slaves/slave$SLAVE_INDEX/docker-compose.yml
-		version: "3"
-		services:
-		  slave:
-		    image: 118104210923.dkr.ecr.us-east-2.amazonaws.com/jenkins-slave:$PROJECT_NAME
-		    environment:
-		      JENKINS_IP: $JENKINS_IP
-		      SECRET_KEY: $SLAVE_SECRET_KEY
-		      SLAVE_NUMBER: $SLAVE_INDEX
-		    logging:
-		      driver: awslogs
-		      options:
-		        awslogs-group: slave
-		        awslogs-region: us-east-2
-		        awslogs-stream-prefix: slave_
-	EOF
-}
-
-# Create a parameters file for the compute resources given to a specific slave for use with the ECS CLI
-function createEcsParamsFile() {
-  touch /home/ec2-user/slaves/slave$SLAVE_INDEX/ecs-params.yml
-	cat <<- EOF > /home/ec2-user/slaves/slave$SLAVE_INDEX/ecs-params.yml
-		version: 1
-		task_definition:
-		  ecs_network_mode: bridge
-		  services:
-		    slave:
-		      cpu_shares: 1024
-		      mem_limit: 2065000000
-	EOF
-}
-
 # Create Jenkins slave configuration payload
 function createJenkinsSlaveConfigPayload() {
   mkdir /home/ec2-user/slaves/slave$SLAVE_INDEX
@@ -81,15 +46,8 @@ function launchSlaveInEcs() {
 # Pull project name from a safe location
 PROJECT_NAME=$(sed -e 's/-jenkins//g' <<< $(cat /home/ec2-user/.ssh/authorized_keys | grep -Po '[[:space:]][a-zA-Z]*\-jenkins$'))
 
-# Configure the ECS CLI to use the correct cluster and region
-sudo /usr/local/bin/ecs-cli configure --cluster $PROJECT_NAME-jenkins-slaves --region us-east-2 --default-launch-type EC2 --config-name $PROJECT_NAME-jenkins-slaves
-
 # Query how many slaves are currently in the cluster
 CURRENT_SLAVE_COUNT=$(aws ecs describe-clusters --cluster $PROJECT_NAME-jenkins-slaves --region us-east-2 | jq '.clusters[0].registeredContainerInstancesCount')
-
-# Scale up the cluster
-DESIRED_SLAVE_COUNT=$(($CURRENT_SLAVE_COUNT + 1))
-sudo /usr/local/bin/ecs-cli scale --cluster $PROJECT_NAME-jenkins-slaves --size $DESIRED_SLAVE_COUNT --region us-east-2 --capability-iam
 
 # Set the Jenkins password variable
 JENKINS_PASSWORD=$(/home/ec2-user/printJenkinsPassword.sh)
@@ -129,17 +87,15 @@ done
 rm -Rf /home/ec2-user/slaves/slave$SLAVE_INDEX || true
 createJenkinsSlaveConfigPayload
 createSlaveInJenkins
-# createDockerComposeFile
-# createEcsParamsFile
 
 # Wait until the registered container instances count of the cluster reaches the desired slave count
-while : ; do
-  CURRENT_SLAVE_COUNT=$(aws ecs describe-clusters --cluster "$PROJECT_NAME"-jenkins-slaves --region us-east-2 | jq '.clusters[0].registeredContainerInstancesCount')
-  [[ $CURRENT_SLAVE_COUNT -eq $DESIRED_SLAVE_COUNT ]] || break
-  sleep 2
-done
+#while : ; do
+#  CURRENT_SLAVE_COUNT=$(aws ecs describe-clusters --cluster "$PROJECT_NAME"-jenkins-slaves --region us-east-2 | jq '.clusters[0].registeredContainerInstancesCount')
+#  [[ $CURRENT_SLAVE_COUNT -eq $DESIRED_SLAVE_COUNT ]] || break
+#  sleep 2
+#done
 # TODO: Check for instance ids of initializing instances and wait until they are all no longer in "initializing" state
-sleep 30
+#sleep 30
 
 launchSlaveInEcs
 

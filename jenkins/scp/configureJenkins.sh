@@ -11,6 +11,13 @@ function changeSlavePort() {
   sudo sed -i 's#<slaveAgentPort>.*#<slaveAgentPort>37001<\/slaveAgentPort>#g' /var/lib/jenkins/config.xml
 }
 
+# Change the number of executors on the master node to zero if there are slaves
+function changeExecutorCountOfMaster() {
+  if [ "$CONFIGURE_SLAVES" == "true" ]; then
+    sudo sed -i 's#<numExecutors>.*#<numExecutors>0<\/numExecutors>#g' /var/lib/jenkins/config.xml
+  fi
+}
+
 # TODO: Use a heredoc
 # Create native Jenkins job template XML files from jobs.json and use the new XML file to create a Jenkins job
 function createJenkinsJobsFromJobsConfig() {
@@ -125,9 +132,11 @@ function recordSuccessfulRun() {
   echo "JENKINS_CONFIGURED=true" | sudo tee --append /configurationProgress.sh
 }
 
+CONFIGURE_SLAVES="$2"
 downloadCli
 avoidSetupWizard
 changeSlavePort
+changeExecutorCountOfMaster
 installPlugins
 restartJenkins
 createJenkinsJobsFromJobsConfig
